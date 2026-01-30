@@ -1,5 +1,5 @@
 import { Redirect } from "expo-router";
-import { useAuth } from "../src/contexts/AuthContext";
+import { useAuth } from "../src/providers/AuthProvider";
 import { Loading } from "../src/components/Loading";
 
 export default function Index() {

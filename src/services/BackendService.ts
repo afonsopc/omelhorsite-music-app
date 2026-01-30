@@ -1,4 +1,4 @@
-export const BACKEND_URL = "http://192.168.50.240:1143";
+export const BACKEND_URL = "https://omelhorsite.pt/backend";
 
 let authToken: string | null = null;
 

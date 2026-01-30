@@ -19,7 +19,10 @@
         "ITSAppUsesNonExemptEncryption": false,
         "UIBackgroundModes": [
           "audio"
-        ]
+        ],
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
       }
     },
     "android": {
@@ -36,12 +39,6 @@
     },
     "plugins": [
       "expo-router",
-      [
-        "expo-audio",
-        {
-          "microphonePermission": false
-        }
-      ],
       "expo-asset"
     ],
     "scheme": "music-app",

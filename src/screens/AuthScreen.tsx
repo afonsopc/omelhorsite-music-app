@@ -14,12 +14,12 @@ import {
   GlassInput,
   GlassButton,
 } from "../components/ui/GlassContainer";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../providers/AuthProvider";
 
 export const AuthScreen = ({}: {}) => {
   const { login } = useAuth();
-  const [email, setEmail] = useState("afonsopcastro@gmail.com");
-  const [password, setPassword] = useState("dev");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {

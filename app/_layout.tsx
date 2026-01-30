@@ -1,7 +1,7 @@
 import { Slot } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { AuthProvider } from "../src/contexts/AuthContext";
-import { MusicProvider } from "../src/contexts/MusicContext";
+import { AuthProvider } from "../src/providers/AuthProvider";
+import { MusicProvider } from "../src/providers/MusicProvider";
 import { QueryProvider } from "../src/providers/QueryProvider";
 
 export default function RootLayout() {

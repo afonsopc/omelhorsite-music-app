@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   View,
   Text,
@@ -6,11 +6,14 @@ import {
   ScrollView,
   Animated,
   PanResponder,
+  Modal,
+  Pressable,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useMusic } from "../../contexts/MusicContext";
 import { Song } from "../../services/MusicService";
+import { PLAYBACK_SPEEDS, PlaybackSpeed } from "../../types/player";
 import { PlayerHeader } from "./PlayerHeader";
 import { PlayerArtwork } from "./PlayerArtwork";
 import { PlayerSongInfo } from "./PlayerSongInfo";
@@ -23,16 +26,21 @@ export const FullPlayer = ({}: {}) => {
   const {
     currentSong,
     isPlaying,
-    play,
-    pause,
+    togglePlay,
     seek,
-    duration,
-    position,
     next,
     previous,
     hasNext,
     hasPrevious,
+    repeatMode,
+    isShuffled,
+    playbackSpeed,
+    toggleRepeat,
+    toggleShuffle,
+    setPlaybackSpeed,
   } = useMusic();
+  
+  const [showSpeedModal, setShowSpeedModal] = useState(false);
   const router = useRouter();
 
   const translateY = useRef(new Animated.Value(0)).current;
@@ -96,8 +104,13 @@ export const FullPlayer = ({}: {}) => {
     );
   }
 
-  const handlePlayPause = () => {
-    isPlaying ? pause() : play();
+  const handleSpeedPress = () => {
+    setShowSpeedModal(true);
+  };
+
+  const handleSpeedSelect = (speed: PlaybackSpeed) => {
+    setPlaybackSpeed(speed);
+    setShowSpeedModal(false);
   };
 
   const artworkUrl = Song.artworkUrl(currentSong);
@@ -125,22 +138,60 @@ export const FullPlayer = ({}: {}) => {
             album={currentSong.album || "Unknown Album"}
           />
 
-          <PlayerProgress
-            position={position}
-            duration={duration}
-            onSeek={seek}
-          />
+          <PlayerProgress onSeek={seek} />
 
           <PlayerControls
             isPlaying={isPlaying}
-            onPlayPause={handlePlayPause}
+            onPlayPause={togglePlay}
             onNext={next}
             onPrevious={previous}
             hasNext={hasNext}
             hasPrevious={hasPrevious}
+            repeatMode={repeatMode}
+            isShuffled={isShuffled}
+            playbackSpeed={playbackSpeed}
+            onToggleRepeat={toggleRepeat}
+            onToggleShuffle={toggleShuffle}
+            onSpeedPress={handleSpeedPress}
           />
         </ScrollView>
       </Animated.View>
+
+      {/* Speed Selection Modal */}
+      <Modal
+        visible={showSpeedModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowSpeedModal(false)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setShowSpeedModal(false)}
+        >
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Playback Speed</Text>
+            {PLAYBACK_SPEEDS.map((speed) => (
+              <Pressable
+                key={speed}
+                style={[
+                  styles.speedOption,
+                  speed === playbackSpeed && styles.speedOptionActive,
+                ]}
+                onPress={() => handleSpeedSelect(speed)}
+              >
+                <Text
+                  style={[
+                    styles.speedOptionText,
+                    speed === playbackSpeed && styles.speedOptionTextActive,
+                  ]}
+                >
+                  {speed}x
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        </Pressable>
+      </Modal>
     </LinearGradient>
   );
 };
@@ -158,5 +209,47 @@ const styles = StyleSheet.create({
     color: "rgba(255, 255, 255, 0.6)",
     textAlign: "center",
     marginTop: 100,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    backgroundColor: "#1a1a1a",
+    borderRadius: 16,
+    padding: 24,
+    width: "80%",
+    maxWidth: 300,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#FFFFFF",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  speedOption: {
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    marginBottom: 8,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    alignItems: "center",
+  },
+  speedOptionActive: {
+    backgroundColor: "rgba(255, 107, 107, 0.2)",
+    borderWidth: 2,
+    borderColor: "#FF6B6B",
+  },
+  speedOptionText: {
+    fontSize: 18,
+    color: "#FFFFFF",
+    fontWeight: "500",
+  },
+  speedOptionTextActive: {
+    color: "#FF6B6B",
+    fontWeight: "600",
   },
 });

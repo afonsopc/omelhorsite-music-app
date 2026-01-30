@@ -1,3 +1,4 @@
+import { Track } from "react-native-track-player";
 import {
   backend,
   getAuthenticatedBackendUrl,
@@ -80,9 +81,19 @@ export const Song = {
   artworkUrl: (song: Song) => {
     const fileId =
       song.compressed_artwork_fs_node_id || song.artwork_fs_node_id;
-    if (!fileId) return null;
+    if (!fileId) return;
     return getAuthenticatedBackendUrl(`fs_nodes/${fileId}/data`);
   },
+  toTrack: (song: Song): Track => ({
+    id: song.id.toString(),
+    url: Song.audioUrl(song),
+    artwork: Song.artworkUrl(song),
+    title: song.title || "Unknown Title",
+    artist: song.artist || "Unknown Artist",
+    album: song.album || "Unknown Album",
+    duration: song.duration,
+    isLiveStream: false,
+  }),
   is: (variable: any): variable is Song => {
     return (
       !!variable &&

@@ -1,16 +1,14 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Slider from "@react-native-community/slider";
+import { useProgress } from "react-native-track-player";
 
 export const PlayerProgress = ({
-  position,
-  duration,
   onSeek,
 }: {
-  position: number;
-  duration: number;
   onSeek: (position: number) => Promise<void>;
 }) => {
+  const { position, duration } = useProgress();
   const [isSeeking, setIsSeeking] = useState(false);
   const [seekPosition, setSeekPosition] = useState(0);
 

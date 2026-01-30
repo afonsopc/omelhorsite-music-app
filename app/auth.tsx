@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
-import { useAuth } from "../src/contexts/AuthContext";
+import { useAuth } from "../src/providers/AuthProvider";
 import { AuthScreen } from "../src/screens/AuthScreen";
 
 export default function Auth() {

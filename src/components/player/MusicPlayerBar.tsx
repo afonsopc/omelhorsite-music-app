@@ -2,11 +2,11 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { GlassContainer } from "../../components/ui/GlassContainer";
-import { useMusicState } from "../../contexts/MusicContext";
+import { useMusic } from "../../contexts/MusicContext";
 import { Song } from "../../services/MusicService";
 
 export const MusicPlayerBar = ({ onPress }: { onPress?: () => void }) => {
-  const { currentSong, isPlaying, play, pause } = useMusicState();
+  const { currentSong, isPlaying, togglePlay } = useMusic();
 
   if (!currentSong) {
     return null;
@@ -14,11 +14,7 @@ export const MusicPlayerBar = ({ onPress }: { onPress?: () => void }) => {
 
   const handlePlayPause = () => {
     console.log("MusicPlayerBar: Play/Pause clicked, isPlaying:", isPlaying);
-    if (isPlaying) {
-      pause();
-    } else {
-      play();
-    }
+    togglePlay();
   };
 
   const artworkUrl = Song.artworkUrl(currentSong);
