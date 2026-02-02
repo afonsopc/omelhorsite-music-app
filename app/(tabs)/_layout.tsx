@@ -3,7 +3,7 @@ import { View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { NativeTabs, Icon, Label } from "expo-router/unstable-native-tabs";
 import { MusicPlayerBar } from "../../src/components/player/MusicPlayerBar";
-import { useMusicState } from "../../src/contexts/MusicContext";
+import { useMusicState } from "../../src/providers/MusicProvider";
 
 export default function TabLayout() {
   const { currentSong } = useMusicState();

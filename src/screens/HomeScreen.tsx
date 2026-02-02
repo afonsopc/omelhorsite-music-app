@@ -9,7 +9,7 @@ import {
   Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useMusicState, useMusicActions } from "../contexts/MusicContext";
+import { useMusicState, useMusicActions } from "../providers/MusicProvider";
 import { Song, Playlist, PlaylistSong } from "../services/MusicService";
 import { GlassButton, GlassCard } from "../components/ui/GlassContainer";
 

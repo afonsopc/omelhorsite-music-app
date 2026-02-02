@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { GlassContainer } from "../../components/ui/GlassContainer";
-import { useMusic } from "../../contexts/MusicContext";
+import { useMusic } from "../../providers/MusicProvider";
 import { Song } from "../../services/MusicService";
 
 export const MusicPlayerBar = ({ onPress }: { onPress?: () => void }) => {

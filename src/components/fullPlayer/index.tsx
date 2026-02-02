@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { useMusic } from "../../contexts/MusicContext";
+import { useMusic } from "../../providers/MusicProvider";
 import { Song } from "../../services/MusicService";
 import { PLAYBACK_SPEEDS, PlaybackSpeed } from "../../types/player";
 import { PlayerHeader } from "./PlayerHeader";
@@ -39,7 +39,7 @@ export const FullPlayer = ({}: {}) => {
     toggleShuffle,
     setPlaybackSpeed,
   } = useMusic();
-  
+
   const [showSpeedModal, setShowSpeedModal] = useState(false);
   const router = useRouter();
 

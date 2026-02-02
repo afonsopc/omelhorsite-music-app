@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { GlassCard, GlassInput } from "../components/ui/GlassContainer";
 import { Song, Playlist, search, Album } from "../services/MusicService";
+import { useMusicActions } from "../providers/MusicProvider";
 
 export const SearchScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -20,6 +21,19 @@ export const SearchScreen: React.FC = () => {
     playlists: Playlist[];
   }>({ songs: [], artists: [], albums: [], playlists: [] });
   const [isSearching, setIsSearching] = useState(false);
+
+  const { loadAndPlay } = useMusicActions();
+
+  const handleSongPress = useCallback(
+    async (song: Song) => {
+      try {
+        await loadAndPlay(song, searchResults.songs);
+      } catch (error) {
+        console.error("Failed to play song from search:", error);
+      }
+    },
+    [loadAndPlay, searchResults.songs]
+  );
 
   const handleSearch = async (query: string) => {
     setSearchQuery(query);
@@ -44,7 +58,8 @@ export const SearchScreen: React.FC = () => {
   const SearchResultItem: React.FC<{
     item: Song | string | Album | Playlist;
     type: "song" | "artist" | "album" | "playlist";
-  }> = ({ item, type }) => {
+    onPress?: () => void;
+  }> = ({ item, type, onPress }) => {
     let name: string;
     let subtitle: string = "";
 
@@ -71,7 +86,7 @@ export const SearchScreen: React.FC = () => {
     }
 
     return (
-      <TouchableOpacity style={styles.resultItem}>
+      <TouchableOpacity style={styles.resultItem} onPress={onPress}>
         <GlassCard style={styles.resultCard}>
           <View style={styles.resultContent}>
             <View style={styles.resultIcon}>
@@ -160,6 +175,7 @@ export const SearchScreen: React.FC = () => {
                     key={`song-${song.id}`}
                     item={song}
                     type="song"
+                    onPress={() => handleSongPress(song)}
                   />
                 ))}
               </View>
