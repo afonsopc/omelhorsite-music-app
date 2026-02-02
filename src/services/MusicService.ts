@@ -1,9 +1,11 @@
 import { Track } from "react-native-track-player";
 import {
   backend,
+  FALLBACK_IMAGE_URL,
   getAuthenticatedBackendUrl,
   ListFilters,
 } from "./BackendService";
+import { FsNode } from "./FsNodeService";
 
 export type Song = {
   id: number;
@@ -65,24 +67,44 @@ export const Song = {
     ),
   delete: (id: Song["id"]) =>
     backend<void>(`songs/${id}`, "DELETE").then((response) => response.data),
-  listArtists: () =>
-    backend<string[]>("songs/artists", "GET").then((response) => response.data),
-  listAlbums: () =>
-    backend<Album[]>("songs/albums", "GET").then((response) => response.data),
+  listArtists: (filters: ListFilters<Song> = {}) =>
+    backend<string[]>("songs/artists", "GET", filters).then(
+      (response) => response.data,
+    ),
+  listAlbums: (filters: ListFilters<Song> = {}) =>
+    backend<Album[]>("songs/albums", "GET", filters).then(
+      (response) => response.data,
+    ),
   getArtistPictures: (artistName: string) =>
-    backend<string[]>(
+    backend<{
+      pictures: {
+        picture?: string;
+        picture_big?: string;
+        picture_medium?: string;
+        picture_small?: string;
+        picture_xl?: string;
+      }[];
+    }>(
       `songs/artist_pictures?name=${encodeURIComponent(artistName)}`,
       "GET",
-    ).then((response) => response.data),
-  audioUrl: (song: Song) => {
-    const fileId = song.compressed_audio_fs_node_id || song.audio_fs_node_id;
-    return getAuthenticatedBackendUrl(`fs_nodes/${fileId}/data`);
-  },
+    ).then((response) => response.data.pictures),
+  getArtistPicture: (artistName: string) =>
+    Song.getArtistPictures(artistName).then(
+      (pictures) =>
+        pictures[0]?.picture_xl ||
+        pictures[0]?.picture_big ||
+        pictures[0]?.picture_medium ||
+        pictures[0]?.picture_small ||
+        pictures[0]?.picture ||
+        FALLBACK_IMAGE_URL,
+    ),
+  audioUrl: (song: Song) =>
+    FsNode.dataUrl(song.compressed_audio_fs_node_id || song.audio_fs_node_id),
   artworkUrl: (song: Song) => {
     const fileId =
       song.compressed_artwork_fs_node_id || song.artwork_fs_node_id;
-    if (!fileId) return;
-    return getAuthenticatedBackendUrl(`fs_nodes/${fileId}/data`);
+    if (!fileId) return FALLBACK_IMAGE_URL;
+    return FsNode.dataUrl(fileId);
   },
   toTrack: (song: Song): Track => ({
     id: song.id.toString(),
@@ -132,10 +154,8 @@ export const Playlist = {
       song_ids: songIds,
     }).then((response) => response.data),
   artworkUrl: (playlist: Playlist) => {
-    if (!playlist.artwork_fs_node_id) return null;
-    return getAuthenticatedBackendUrl(
-      `fs_nodes/${playlist.artwork_fs_node_id}/data`,
-    );
+    if (!playlist.artwork_fs_node_id) return FALLBACK_IMAGE_URL;
+    return FsNode.dataUrl(playlist.artwork_fs_node_id);
   },
   is: (variable: any): variable is Playlist => {
     return (

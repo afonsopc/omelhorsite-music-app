@@ -12,76 +12,8 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { GlassCard, GlassButton } from "../components/ui/GlassContainer";
 import { Playlist } from "../services/MusicService";
-import { useListPlaylistsQuery } from "../lib/queries/music";
 
 export const PlaylistsScreen: React.FC = () => {
-  const { data, isLoading, error } = useListPlaylistsQuery();
-
-  const playlists = data || [];
-
-  const EmptyState = () => (
-    <GlassCard style={styles.emptyStateCard}>
-      <Text style={styles.emptyStateTitle}>No Playlists Yet</Text>
-      <Text style={styles.emptyStateText}>
-        Create your first playlist to start organizing your music
-      </Text>
-      <GlassButton style={styles.createButton}>
-        <Text style={styles.createButtonText}>Create Playlist</Text>
-      </GlassButton>
-    </GlassCard>
-  );
-
-  const PlaylistItem: React.FC<{ playlist: Playlist }> = ({ playlist }) => {
-    const artworkUrl = Playlist.artworkUrl(playlist);
-
-    return (
-      <TouchableOpacity style={styles.playlistItem}>
-        <GlassCard style={styles.playlistCard}>
-          <View style={styles.playlistContent}>
-            {artworkUrl ? (
-              <Image
-                source={{ uri: artworkUrl }}
-                style={styles.playlistArtwork}
-                resizeMode="cover"
-              />
-            ) : (
-              <LinearGradient
-                colors={["#667eea", "#764ba2"]}
-                style={styles.playlistArtworkPlaceholder}
-              >
-                <Text style={styles.playlistArtworkText}>
-                  {playlist.name.charAt(0).toUpperCase()}
-                </Text>
-              </LinearGradient>
-            )}
-
-            <View style={styles.playlistInfo}>
-              <Text style={styles.playlistName} numberOfLines={1}>
-                {playlist.name}
-              </Text>
-              <Text style={styles.playlistMeta}>
-                {playlist.song_count || 0} songs
-              </Text>
-              <Text style={styles.playlistDate}>
-                Created {new Date(playlist.created_at).toLocaleDateString()}
-              </Text>
-            </View>
-          </View>
-        </GlassCard>
-      </TouchableOpacity>
-    );
-  };
-
-  if (isLoading) {
-    return (
-      <LinearGradient colors={["#000000", "#1a1a1a"]} style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading playlists...</Text>
-        </View>
-      </LinearGradient>
-    );
-  }
-
   return (
     <LinearGradient colors={["#000000", "#1a1a1a"]} style={styles.container}>
       <ScrollView
@@ -91,35 +23,8 @@ export const PlaylistsScreen: React.FC = () => {
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Playlists</Text>
           <Text style={styles.headerSubtitle}>Your music collections</Text>
+          <Text style={styles.headerSubtitle}>NOT IMPLEMENTED</Text>
         </View>
-
-        <View style={styles.createSection}>
-          <GlassButton style={styles.createPlaylistButton}>
-            <Text style={styles.createPlaylistButtonText}>
-              + Create New Playlist
-            </Text>
-          </GlassButton>
-        </View>
-
-        {isLoading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#ffffff" />
-          </View>
-        ) : error ? (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>Failed to load playlists</Text>
-          </View>
-        ) : !playlists || playlists.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <View style={styles.playlistsSection}>
-            {playlists.map((playlist) => (
-              <PlaylistItem key={playlist.id} playlist={playlist} />
-            ))}
-          </View>
-        )}
-
-        {/* Add some bottom padding */}
         <View style={{ height: 100 }} />
       </ScrollView>
     </LinearGradient>

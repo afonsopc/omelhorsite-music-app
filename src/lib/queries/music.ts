@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Song, Playlist, PlaylistSong } from "../../services/MusicService";
+import { Song } from "../../services/MusicService";
 import { ListFilters } from "../../services/BackendService";
 
 export const LIST_SONGS = "listSongs";
@@ -11,53 +11,90 @@ export const GET_PLAYLIST = "getPlaylist";
 export const LIST_PLAYLIST_SONGS = "listPlaylistSongs";
 export const LIST_ARTIST_PICTURES = "listArtistPictures";
 
-export const useListSongsQuery = (filters: ListFilters<Song> = {}) => {
+const query = <T>(
+  queryKey: string,
+  queryFn: () => Promise<T>,
+  options?: { enabled?: boolean },
+) => {
   return useQuery({
-    queryKey: [LIST_SONGS, filters],
-    queryFn: async () => {
-      return Song.list(filters);
-    },
+    queryKey: [queryKey],
+    queryFn,
+    enabled: options?.enabled,
   });
 };
 
 export const useGetSongQuery = (
   id: number,
-  options?: { enabled?: boolean },
+  options?: Record<string, string>,
 ) => {
-  return useQuery({
-    queryKey: [GET_SONG, id],
-    queryFn: async () => {
-      return Song.get(id);
-    },
-    enabled: options?.enabled,
-  });
+  return query(GET_SONG + id, () => Song.get(id), options);
 };
 
-export const useListArtistsQuery = () => {
-  return useQuery({
-    queryKey: [LIST_ARTISTS],
-    queryFn: async () => {
-      return Song.listArtists();
-    },
-  });
+export const useListSongsQuery = (
+  filters: ListFilters<Song> = {},
+  options?: Record<string, string>,
+) => query(LIST_SONGS, () => Song.list(filters), options);
+
+export const useListArtistsQuery = (
+  filters: ListFilters<Song> = {},
+  options?: Record<string, string>,
+) => {
+  return query(LIST_ARTISTS, () => Song.listArtists(filters), options);
 };
 
-export const useListAlbumsQuery = () => {
-  return useQuery({
-    queryKey: [LIST_ALBUMS],
-    queryFn: async () => {
-      return Song.listAlbums();
-    },
-  });
+export const useListAlbumsQuery = (
+  filters: ListFilters<Song> = {},
+  options?: Record<string, string>,
+) => {
+  return query(LIST_ALBUMS, () => Song.listAlbums(filters), options);
 };
 
-export const useArtistPicturesQuery = (artistName: string) => {
-  return useQuery({
-    queryKey: [LIST_ARTIST_PICTURES, artistName],
-    queryFn: async () => {
-      return Song.getArtistPictures(artistName);
-    },
-  });
+export const useListSongsByArtistQuery = (
+  artistName: string,
+  options?: Record<string, string>,
+) => {
+  return query(
+    LIST_SONGS + artistName,
+    () => Song.list({ exact_search: { artist: artistName } }),
+    options,
+  );
+};
+
+export const useListAlbumsByArtistQuery = (
+  artistName: string,
+  options?: Record<string, string>,
+) => {
+  return query(
+    LIST_ALBUMS + artistName,
+    () => Song.listAlbums({ exact_search: { artist: artistName } }),
+    options,
+  );
+};
+
+export const useListSongsByAlbumQuery = (
+  albumName: string,
+  artistName?: string,
+  options?: Record<string, string>,
+) => {
+  const filters = artistName
+    ? { exact_search: { album: albumName, artist: artistName } }
+    : { exact_search: { album: albumName } };
+  return query(
+    LIST_SONGS + albumName + (artistName || ""),
+    () => Song.list(filters),
+    options,
+  );
+};
+
+export const useArtitstPictureQuery = (
+  artistName: string,
+  options?: Record<string, string>,
+) => {
+  return query(
+    LIST_ARTIST_PICTURES + artistName,
+    () => Song.getArtistPicture(artistName),
+    options,
+  );
 };
 
 export const useUpdateSongMutation = () => {
@@ -85,146 +122,6 @@ export const useDeleteSongMutation = () => {
       queryClient.invalidateQueries({ queryKey: [LIST_SONGS] });
       queryClient.invalidateQueries({ queryKey: [LIST_ARTISTS] });
       queryClient.invalidateQueries({ queryKey: [LIST_ALBUMS] });
-    },
-  });
-};
-
-export const useListPlaylistsQuery = () => {
-  return useQuery({
-    queryKey: [LIST_PLAYLISTS],
-    queryFn: async () => {
-      return Playlist.list();
-    },
-  });
-};
-
-export const useGetPlaylistQuery = (
-  id: number,
-  options?: { enabled?: boolean },
-) => {
-  return useQuery({
-    queryKey: [GET_PLAYLIST, id],
-    queryFn: async () => {
-      return Playlist.get(id);
-    },
-    enabled: options?.enabled,
-  });
-};
-
-export const useListPlaylistSongsQuery = (
-  playlistId: number,
-  options?: { enabled?: boolean },
-) => {
-  return useQuery({
-    queryKey: [LIST_PLAYLIST_SONGS, playlistId],
-    queryFn: async () => {
-      return PlaylistSong.list(playlistId);
-    },
-    enabled: options?.enabled,
-  });
-};
-
-export const useCreatePlaylistMutation = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async ({
-      name,
-      artworkFsNodeId,
-    }: {
-      name: string;
-      artworkFsNodeId?: string;
-    }) => {
-      return Playlist.create(name, artworkFsNodeId);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [LIST_PLAYLISTS] });
-    },
-  });
-};
-
-export const useUpdatePlaylistMutation = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async ({
-      id,
-      data,
-    }: {
-      id: number;
-      data: Partial<Playlist>;
-    }) => {
-      return Playlist.update(id, data);
-    },
-    onSuccess: (playlist) => {
-      queryClient.invalidateQueries({ queryKey: [LIST_PLAYLISTS] });
-      queryClient.invalidateQueries({ queryKey: [GET_PLAYLIST, playlist.id] });
-    },
-  });
-};
-
-export const useDeletePlaylistMutation = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (id: number) => {
-      return Playlist.delete(id);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [LIST_PLAYLISTS] });
-    },
-  });
-};
-
-export const useReorderPlaylistMutation = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async ({ id, songIds }: { id: number; songIds: number[] }) => {
-      return Playlist.reorder(id, songIds);
-    },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: [LIST_PLAYLIST_SONGS, variables.id],
-      });
-    },
-  });
-};
-
-export const useAddSongToPlaylistMutation = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async ({
-      playlistId,
-      songId,
-    }: {
-      playlistId: number;
-      songId: number;
-    }) => {
-      return PlaylistSong.create(playlistId, songId);
-    },
-    onSuccess: (playlistSong) => {
-      queryClient.invalidateQueries({
-        queryKey: [LIST_PLAYLIST_SONGS, playlistSong.playlist_id],
-      });
-      queryClient.invalidateQueries({ queryKey: [LIST_PLAYLISTS] });
-    },
-  });
-};
-
-export const useRemoveSongFromPlaylistMutation = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async ({
-      id,
-      playlistId,
-    }: {
-      id: number;
-      playlistId: number;
-    }) => {
-      return PlaylistSong.delete(id);
-    },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: [LIST_PLAYLIST_SONGS, variables.playlistId],
-      });
-      queryClient.invalidateQueries({ queryKey: [LIST_PLAYLISTS] });
     },
   });
 };

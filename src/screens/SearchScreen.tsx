@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,11 +8,14 @@ import {
   Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { GlassCard, GlassInput } from "../components/ui/GlassContainer";
 import { Song, Playlist, search, Album } from "../services/MusicService";
 import { useMusicActions } from "../providers/MusicProvider";
 
 export const SearchScreen: React.FC = () => {
+  const router = useRouter();
+  const { q } = useLocalSearchParams<{ q?: string | string[] }>();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<{
     songs: Song[];
@@ -54,6 +57,13 @@ export const SearchScreen: React.FC = () => {
       setIsSearching(false);
     }
   };
+
+  useEffect(() => {
+    const queryParam = Array.isArray(q) ? q[0] : q;
+    if (queryParam && queryParam !== searchQuery) {
+      handleSearch(queryParam);
+    }
+  }, [q, searchQuery]);
 
   const SearchResultItem: React.FC<{
     item: Song | string | Album | Playlist;
@@ -189,6 +199,12 @@ export const SearchScreen: React.FC = () => {
                     key={`artist-${index}`}
                     item={artist}
                     type="artist"
+                    onPress={() =>
+                      router.push({
+                        pathname: "/artist/[name]",
+                        params: { name: artist, from: "search", query: searchQuery },
+                      })
+                    }
                   />
                 ))}
               </View>
@@ -202,6 +218,17 @@ export const SearchScreen: React.FC = () => {
                     key={`album-${index}`}
                     item={album}
                     type="album"
+                    onPress={() =>
+                      router.push({
+                        pathname: "/album/[name]",
+                        params: {
+                          name: album.name || "Unknown Album",
+                          artist: album.artist || "",
+                          from: "search",
+                          query: searchQuery,
+                        },
+                      })
+                    }
                   />
                 ))}
               </View>

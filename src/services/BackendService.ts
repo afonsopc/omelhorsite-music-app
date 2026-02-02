@@ -1,5 +1,7 @@
 export const BACKEND_URL = "https://omelhorsite.pt/backend";
 
+export const FALLBACK_IMAGE_URL = "https://omelhorsite.pt/fallbackPhoto.jpg";
+
 let authToken: string | null = null;
 
 export const setAuthToken = (token: string | null) => {
