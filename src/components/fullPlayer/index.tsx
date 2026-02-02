@@ -22,7 +22,7 @@ import { PlayerControls } from "./PlayerControls";
 
 const DISMISS_THRESHOLD = 150;
 
-export const FullPlayer = ({}: {}) => {
+export const FullPlayer = ({ onClose }: { onClose?: () => void }) => {
   const {
     currentSong,
     isPlaying,
@@ -42,6 +42,7 @@ export const FullPlayer = ({}: {}) => {
 
   const [showSpeedModal, setShowSpeedModal] = useState(false);
   const router = useRouter();
+  const handleClose = onClose ?? (() => router.back());
 
   const translateY = useRef(new Animated.Value(0)).current;
   const opacity = useRef(new Animated.Value(1)).current;
@@ -75,7 +76,7 @@ export const FullPlayer = ({}: {}) => {
               useNativeDriver: true,
             }),
           ]).start(() => {
-            router.back();
+            handleClose();
           });
         } else {
           Animated.parallel([
@@ -128,7 +129,7 @@ export const FullPlayer = ({}: {}) => {
         {...panResponder.panHandlers}
       >
         <ScrollView showsVerticalScrollIndicator={false}>
-          <PlayerHeader onBack={() => router.back()} />
+          <PlayerHeader onBack={handleClose} />
 
           <PlayerArtwork artworkUrl={artworkUrl} title={currentSong.title} />
 

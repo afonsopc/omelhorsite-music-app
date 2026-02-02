@@ -1,11 +1,25 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  StyleProp,
+  ViewStyle,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { GlassContainer } from "../../components/ui/GlassContainer";
 import { useMusic } from "../../providers/MusicProvider";
 import { Song } from "../../services/MusicService";
 
-export const MusicPlayerBar = ({ onPress }: { onPress?: () => void }) => {
+export const MusicPlayerBar = ({
+  onPress,
+  style,
+}: {
+  onPress?: () => void;
+  style?: StyleProp<ViewStyle>;
+}) => {
   const { currentSong, isPlaying, togglePlay } = useMusic();
 
   if (!currentSong) {
@@ -21,7 +35,7 @@ export const MusicPlayerBar = ({ onPress }: { onPress?: () => void }) => {
 
   return (
     <TouchableOpacity
-      style={styles.container}
+      style={[styles.container, style]}
       onPress={onPress}
       activeOpacity={0.8}
     >
@@ -71,10 +85,7 @@ export const MusicPlayerBar = ({ onPress }: { onPress?: () => void }) => {
 
 const styles = StyleSheet.create({
   container: {
-    position: "absolute",
-    bottom: 88,
-    left: 16,
-    right: 16,
+    width: "100%",
     height: 72,
     borderRadius: 16,
     overflow: "hidden",
