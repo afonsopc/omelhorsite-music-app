@@ -13,10 +13,10 @@ Configuration and instructions for AI agents working with this codebase.
 ## Quick Start
 
 ```bash
-npm start              # Development server
-npm run ios            # iOS simulator
-npm run android        # Android emulator
-npm run web            # Web browser
+bun start              # Development server
+bun run ios            # iOS simulator
+bun run android        # Android emulator
+bun run web            # Web browser
 ```
 
 ## Critical Architecture Rules
@@ -29,6 +29,7 @@ npm run web            # Web browser
 - ✅ Use type guards (`.is()` methods) for API response validation
 - ✅ Invalidate queries after mutations: `queryClient.invalidateQueries()`
 - ✅ Put screens in `src/screens/` and their UI sections in `src/components/{ScreenName}/`
+- ✅ **Name provider files as `*Provider.tsx`** - Follow the existing convention: `AuthProvider.tsx`, `MusicProvider.tsx`, `TabBarProvider.tsx`, etc.
 
 ### DON'T
 - ❌ Never call `MusicService` methods directly in components (use query hooks)
@@ -39,6 +40,9 @@ npm run web            # Web browser
 - ❌ Never use `React.FC` type annotation
 - ❌ Never use `interface` - use `type` keyword instead
 - ❌ Avoid explicit return types on functions (let TypeScript infer them)
+- ❌ Don't add code comments - write self-documenting code with clear variable/function names instead
+- ❌ **NEVER maintain backward compatibility** - This is a new, small app. Always update all code that uses changed APIs instead of creating compatibility layers. Tech debt is unacceptable.
+- ❌ **NEVER create barrel files (index.ts)** - Always import directly from the file. Use `import { Component } from '@/components/Skeletons/SongCardSkeleton'` instead of `from '@/components/Skeletons'`. Barrel files add unnecessary indirection.
 
 ## System Architecture Map
 
@@ -191,12 +195,34 @@ const response = await backend('/api/songs', {
 - `Playlist` - User-created playlists
 - `PlaylistSong` - Junction table for playlist songs
 
+**Filter Types:**
+All list methods use `ListFilters<T>` type from `BackendService.ts`:
+
+```typescript
+type ListFilters<T = {}, U = {}> = {
+  search?: SearchFilters<T>;           // Partial text search on fields
+  modifiers?: ModifierFilters;          // page, order, random
+  exact_search?: ExactSearchFilters<T>; // Exact match on fields
+  extra_options?: ExtraOptionsFilters<U>; // Extra params
+};
+```
+
 **Common Methods:**
 ```typescript
-// Lists
-const songs = await Song.list({ artist: 'Queen', limit: 50 });
+// Lists with filters
+const songs = await Song.list({
+  search: { artist: 'Queen', album: 'Night' },  // Partial match
+  modifiers: { random: true, page: '1' }
+});
+
+const songs = await Song.list({
+  exact_search: { artist: 'Queen' }  // Exact match
+});
+
 const artists = await Song.listArtists();
-const albums = await Song.listAlbums({ artist: 'Queen' });
+const albums = await Song.listAlbums({ 
+  exact_search: { artist: 'Queen' }
+});
 const playlists = await Playlist.list();
 
 // Single entity
@@ -285,6 +311,89 @@ export function FeaturedSection({ songs }: { songs: Song[] }) {
   - `FullPlayerControls` - Play/pause/skip buttons
   - `FullPlayerProgress` - Seek bar and time
 
+### Skeleton Loading Components
+
+**Location:** `src/components/Skeletons/`
+
+**Library:** `react-content-loader` with `react-native-svg` (< 2kB bundle impact)
+
+**Purpose:** Provide content-aware loading states that match the glassmorphism design
+
+**Available Skeletons:**
+
+1. **SongCardSkeleton** - For horizontal song cards (150x174px)
+   - Usage: `RandomSongsSection` loading state
+   - Shows: Album artwork placeholder + title + artist lines
+   - Count: 6 items
+
+2. **ArtistCardSkeleton** - For artist cards (130x122px)
+   - Usage: `RandomArtistsSection` loading state
+   - Shows: Circular avatar + name line
+   - Count: 10 items
+
+3. **AlbumCardSkeleton** - For album cards (150x188px)
+   - Usage: `RandomAlbumsSection`, `ArtistScreen` albums section
+   - Shows: Album artwork placeholder + title + artist lines
+   - Count: 10 items (Home), 4 items (Artist screen)
+
+4. **SongListItemSkeleton** - For list-style song rows (340x52px)
+   - Usage: `ArtistScreen`, `AlbumScreen` track lists
+   - Shows: Small artwork + title/subtitle + duration
+   - Count: 10 items (Artist), 12 items (Album)
+
+**Design System:**
+```typescript
+// Skeleton colors (matches glassmorphism theme)
+backgroundColor: "rgba(255, 255, 255, 0.05)"  // Subtle glass tint
+foregroundColor: "rgba(255, 255, 255, 0.1)"   // Shimmer effect
+speed: 1.2                                     // Animation speed
+
+// Container styling
+background: "rgba(255, 255, 255, 0.08)"
+borderRadius: 16
+borderWidth: 1
+borderColor: "rgba(255, 255, 255, 0.2)"
+```
+
+**Usage Pattern:**
+```typescript
+import { SongCardSkeleton } from "@/components/Skeletons";
+
+// In component with TanStack Query
+if (query.isLoading) {
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Section Title</Text>
+      <ScrollView horizontal>
+        {Array.from({ length: 6 }).map((_, i) => (
+          <View key={i} style={styles.item}>
+            <SongCardSkeleton />
+          </View>
+        ))}
+      </ScrollView>
+    </View>
+  );
+}
+
+// Real content
+return <ActualContent data={query.data} />;
+```
+
+**When to Use Skeletons:**
+- ✅ Always use skeletons for TanStack Query loading states
+- ✅ Match skeleton count to typical content volume
+- ✅ Show section titles even during loading
+- ✅ Maintain exact layout structure (horizontal scroll, vertical list, etc.)
+- ❌ Don't use generic "Loading..." text
+- ❌ Don't show spinner/activity indicators for data fetching
+
+**Components Using Skeletons:**
+- `src/components/HomeScreen/RandomSongsSection.tsx` - 6 song cards
+- `src/components/HomeScreen/RandomArtistsSection.tsx` - 10 artist cards
+- `src/components/HomeScreen/RandomAlbumsSection.tsx` - 10 album cards
+- `src/screens/ArtistScreen.tsx` - 4 albums + 10 songs
+- `src/screens/AlbumScreen.tsx` - 12 tracks
+
 ## Performance Guidelines
 
 ### Image Caching
@@ -301,6 +410,32 @@ export function FeaturedSection({ songs }: { songs: Song[] }) {
 - Modal player prevents main UI re-renders during playback
 - Use `useMusicActions()` instead of `useMusic()` to avoid unnecessary re-renders
 - Use `useMusicPosition()` only in components that need position updates
+
+### TrackPlayer Queue Management
+**CRITICAL:** Always use `TrackPlayer.setQueue()` instead of `reset() + add()` pattern:
+
+```typescript
+// ❌ SLOW - Adds tracks sequentially, skip() iterates through queue
+await TrackPlayer.reset();
+await TrackPlayer.add(tracks);
+await TrackPlayer.skip(index);
+
+// ✅ FAST - Atomic operation, no iteration
+await TrackPlayer.reset();
+await TrackPlayer.setQueue(tracks);
+await TrackPlayer.skip(index);
+```
+
+**Why this matters:**
+- `add()` processes tracks one-by-one (slow for large playlists)
+- `skip(n)` can cause iteration through tracks 0 to n-1
+- `setQueue()` is atomic and much faster
+- Clicking song #50 in a playlist: ~2-3s → <100ms
+
+**Implementation:**
+- `TrackPlayerService.resetAndAddTracks()` uses `setQueue()`
+- `MusicProvider.loadAndPlay()` uses queue caching to avoid unnecessary resets
+- Queue IDs are cached in `currentQueueIdsRef` to detect actual changes
 
 ## TypeScript Conventions
 

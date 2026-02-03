@@ -10,7 +10,7 @@ import {
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { GlassContainer } from "../../components/ui/GlassContainer";
-import { useMusic } from "../../providers/MusicProvider";
+import { useMusicState, useMusicPosition, useMusicActions } from "../../providers/MusicProvider";
 import { Song } from "../../services/MusicService";
 
 export const MusicPlayerBar = ({
@@ -20,14 +20,15 @@ export const MusicPlayerBar = ({
   onPress?: () => void;
   style?: StyleProp<ViewStyle>;
 }) => {
-  const { currentSong, isPlaying, togglePlay } = useMusic();
+  const { currentSong } = useMusicState();
+  const { isPlaying } = useMusicPosition();
+  const { togglePlay } = useMusicActions();
 
   if (!currentSong) {
     return null;
   }
 
   const handlePlayPause = () => {
-    console.log("MusicPlayerBar: Play/Pause clicked, isPlaying:", isPlaying);
     togglePlay();
   };
 

@@ -11,6 +11,7 @@ import {
   useArtitstPictureQuery,
   useListArtistsQuery,
 } from "../../lib/queries/music";
+import { ArtistCardSkeleton } from "../Skeletons/ArtistCardSkeleton";
 
 export type ArtistCard = {
   name: string;
@@ -72,9 +73,17 @@ export const RandomArtistsSection = ({
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Artists for You</Text>
-        <GlassCard style={styles.loadingCard}>
-          <Text style={styles.loadingText}>Loading artists...</Text>
-        </GlassCard>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.horizontalScroll}
+        >
+          {Array.from({ length: 10 }).map((_, i) => (
+            <View key={i} style={styles.artistItem}>
+              <ArtistCardSkeleton />
+            </View>
+          ))}
+        </ScrollView>
       </View>
     );
   }

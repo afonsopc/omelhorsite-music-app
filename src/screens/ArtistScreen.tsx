@@ -19,6 +19,8 @@ import {
 import { ArtistHeader } from "../components/ArtistScreen/ArtistHeader";
 import { AlbumsSection } from "../components/ArtistScreen/AlbumsSection";
 import { SongsSection } from "../components/ArtistScreen/SongsSection";
+import { AlbumCardSkeleton } from "../components/Skeletons/AlbumCardSkeleton";
+import { SongListItemSkeleton } from "../components/Skeletons/SongListItemSkeleton";
 
 export const ArtistScreen = () => {
   const router = useRouter();
@@ -121,9 +123,29 @@ export const ArtistScreen = () => {
         />
 
         {songsQuery.isLoading || albumsQuery.isLoading ? (
-          <GlassCard style={styles.loadingCard}>
-            <Text style={styles.loadingText}>Loading artist...</Text>
-          </GlassCard>
+          <>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Albums</Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.horizontalScroll}
+              >
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <View key={i} style={styles.albumItem}>
+                    <AlbumCardSkeleton />
+                  </View>
+                ))}
+              </ScrollView>
+            </View>
+
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Songs</Text>
+              {Array.from({ length: 10 }).map((_, i) => (
+                <SongListItemSkeleton key={i} />
+              ))}
+            </View>
+          </>
         ) : (
           <>
             <AlbumsSection
@@ -171,5 +193,21 @@ const styles = StyleSheet.create({
   loadingText: {
     color: "#FFFFFF",
     fontSize: 16,
+  },
+  section: {
+    marginBottom: 32,
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: "600",
+    color: "#FFFFFF",
+    marginBottom: 16,
+    paddingHorizontal: 24,
+  },
+  horizontalScroll: {
+    paddingHorizontal: 16,
+  },
+  albumItem: {
+    marginRight: 16,
   },
 });

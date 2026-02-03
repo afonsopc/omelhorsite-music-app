@@ -15,6 +15,7 @@ import { useMusicActions } from "../providers/MusicProvider";
 import { useListSongsByAlbumQuery } from "../lib/queries/music";
 import { AlbumHeader } from "../components/AlbumScreen/AlbumHeader";
 import { TracksSection } from "../components/AlbumScreen/TracksSection";
+import { SongListItemSkeleton } from "../components/Skeletons/SongListItemSkeleton";
 
 export const AlbumScreen = () => {
   const router = useRouter();
@@ -114,9 +115,12 @@ export const AlbumScreen = () => {
         />
 
         {songsQuery.isLoading ? (
-          <GlassCard style={styles.loadingCard}>
-            <Text style={styles.loadingText}>Loading album...</Text>
-          </GlassCard>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Tracks</Text>
+            {Array.from({ length: 12 }).map((_, i) => (
+              <SongListItemSkeleton key={i} />
+            ))}
+          </View>
         ) : (
           <TracksSection songs={orderedSongs} onSongPress={handlePlaySong} />
         )}
@@ -157,5 +161,15 @@ const styles = StyleSheet.create({
   loadingText: {
     color: "#FFFFFF",
     fontSize: 16,
+  },
+  section: {
+    marginBottom: 32,
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: "600",
+    color: "#FFFFFF",
+    marginBottom: 16,
+    paddingHorizontal: 24,
   },
 });

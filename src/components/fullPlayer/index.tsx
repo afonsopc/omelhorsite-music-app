@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { useMusic } from "../../providers/MusicProvider";
+import { useMusicState, useMusicPosition, useMusicActions } from "../../providers/MusicProvider";
 import { Song } from "../../services/MusicService";
 import { PLAYBACK_SPEEDS, PlaybackSpeed } from "../../types/player";
 import { PlayerHeader } from "./PlayerHeader";
@@ -25,20 +25,22 @@ const DISMISS_THRESHOLD = 150;
 export const FullPlayer = ({ onClose }: { onClose?: () => void }) => {
   const {
     currentSong,
-    isPlaying,
-    togglePlay,
-    seek,
-    next,
-    previous,
     hasNext,
     hasPrevious,
     repeatMode,
     isShuffled,
     playbackSpeed,
+  } = useMusicState();
+  const { isPlaying } = useMusicPosition();
+  const {
+    togglePlay,
+    seek,
+    next,
+    previous,
     toggleRepeat,
     toggleShuffle,
     setPlaybackSpeed,
-  } = useMusic();
+  } = useMusicActions();
 
   const [showSpeedModal, setShowSpeedModal] = useState(false);
   const router = useRouter();
@@ -158,7 +160,6 @@ export const FullPlayer = ({ onClose }: { onClose?: () => void }) => {
         </ScrollView>
       </Animated.View>
 
-      {/* Speed Selection Modal */}
       <Modal
         visible={showSpeedModal}
         transparent

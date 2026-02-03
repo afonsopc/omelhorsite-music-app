@@ -54,8 +54,9 @@ export const addTracks = async (songs: Song[]) => {
 };
 
 export const resetAndAddTracks = async (songs: Song[]) => {
+  const tracks = songs.map(Song.toTrack);
   await TrackPlayer.reset();
-  await addTracks(songs);
+  await TrackPlayer.setQueue(tracks);
 };
 
 export const convertRepeatMode = (mode: TPRepeatMode): string =>
@@ -73,15 +74,33 @@ export const convertToTPRepeatMode = (mode: string): TPRepeatMode =>
   })[mode] || TPRepeatMode.Off;
 
 export const playbackService = async () => {
-  TrackPlayer.addEventListener(Event.RemotePlay, TrackPlayer.play);
-  TrackPlayer.addEventListener(Event.RemotePause, TrackPlayer.pause);
-  TrackPlayer.addEventListener(Event.RemoteNext, TrackPlayer.skipToNext);
-  TrackPlayer.addEventListener(Event.RemoteStop, TrackPlayer.pause);
-  TrackPlayer.addEventListener(
-    Event.RemotePrevious,
-    TrackPlayer.skipToPrevious,
-  );
-  TrackPlayer.addEventListener(Event.RemoteSeek, (event) =>
-    TrackPlayer.seekTo(event.position),
-  );
+  TrackPlayer.addEventListener(Event.RemotePlay, async () => {
+    await TrackPlayer.play();
+  });
+
+  TrackPlayer.addEventListener(Event.RemotePause, async () => {
+    await TrackPlayer.pause();
+  });
+
+  TrackPlayer.addEventListener(Event.RemoteNext, async () => {
+    await TrackPlayer.skipToNext();
+  });
+
+  TrackPlayer.addEventListener(Event.RemotePrevious, async () => {
+    await TrackPlayer.skipToPrevious();
+  });
+
+  TrackPlayer.addEventListener(Event.RemoteStop, async () => {
+    await TrackPlayer.pause();
+  });
+
+  TrackPlayer.addEventListener(Event.RemoteSeek, async (event) => {
+    if (event.position !== undefined) {
+      await TrackPlayer.seekTo(event.position);
+    }
+  });
+
+  TrackPlayer.addEventListener(Event.PlaybackError, (error) => {
+    console.error("Playback error:", error);
+  });
 };

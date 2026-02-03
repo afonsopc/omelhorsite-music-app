@@ -1,16 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Slider from "@react-native-community/slider";
-import { useProgress } from "react-native-track-player";
+import { useMusicPosition } from "../../providers/MusicProvider";
 
 export const PlayerProgress = ({
   onSeek,
 }: {
   onSeek: (position: number) => Promise<void>;
 }) => {
-  const { position, duration } = useProgress();
+  const { position, duration } = useMusicPosition();
   const [isSeeking, setIsSeeking] = useState(false);
   const [seekPosition, setSeekPosition] = useState(0);
+  const seekTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const displayPosition = isSeeking ? seekPosition : position;
+
+  useEffect(() => {
+    return () => {
+      if (seekTimeoutRef.current) {
+        clearTimeout(seekTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const formatDuration = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
@@ -20,6 +31,7 @@ export const PlayerProgress = ({
 
   const handleSlidingStart = () => {
     setIsSeeking(true);
+    setSeekPosition(position);
   };
 
   const handleValueChange = (value: number) => {
@@ -27,11 +39,20 @@ export const PlayerProgress = ({
   };
 
   const handleSlidingComplete = async (value: number) => {
-    await onSeek(value);
-    setIsSeeking(false);
-  };
+    if (seekTimeoutRef.current) {
+      clearTimeout(seekTimeoutRef.current);
+    }
 
-  const displayPosition = isSeeking ? seekPosition : position;
+    try {
+      await onSeek(value);
+    } catch (error) {
+      console.error("Seek error:", error);
+    }
+
+    seekTimeoutRef.current = setTimeout(() => {
+      setIsSeeking(false);
+    }, 100);
+  };
 
   return (
     <View style={styles.progressContainer}>

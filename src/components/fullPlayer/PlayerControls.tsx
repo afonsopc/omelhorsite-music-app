@@ -48,7 +48,6 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
 
   return (
     <View style={styles.container}>
-      {/* Top row: Shuffle and Repeat */}
       <View style={styles.secondaryControls}>
         <Pressable
           style={({ pressed }) => [
@@ -79,7 +78,6 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
         </Pressable>
       </View>
 
-      {/* Main controls: Previous, Play/Pause, Next */}
       <View style={styles.mainControls}>
         <Pressable
           style={({ pressed }) => [
@@ -126,7 +124,6 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
         </Pressable>
       </View>
 
-      {/* Speed control */}
       <View style={styles.speedControl}>
         <Pressable
           style={({ pressed }) => [

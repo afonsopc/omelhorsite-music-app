@@ -13,7 +13,11 @@ import { LinearGradient } from "expo-linear-gradient";
 import { GlassCard, GlassButton } from "../components/ui/GlassContainer";
 import { useGetCurrentSessionQuery } from "../lib/queries/accounts";
 import { Session } from "../services/AccountService";
-import { clearImageCache, getCacheSize, formatBytes } from "../config/imageCache";
+import {
+  clearImageCache,
+  getCacheSize,
+  formatBytes,
+} from "../config/imageCache";
 
 export const ProfileScreen: React.FC = () => {
   const { data: session } = useGetCurrentSessionQuery();
@@ -69,7 +73,7 @@ export const ProfileScreen: React.FC = () => {
             }
           },
         },
-      ]
+      ],
     );
   };
 
@@ -175,7 +179,6 @@ export const ProfileScreen: React.FC = () => {
           </GlassButton>
         </View>
 
-        {/* Add some bottom padding */}
         <View style={{ height: 100 }} />
       </ScrollView>
     </LinearGradient>

@@ -10,6 +10,7 @@ import { useMusicActions } from "../../providers/MusicProvider";
 import { Song } from "../../services/MusicService";
 import { GlassCard } from "../ui/GlassContainer";
 import { useListSongsQuery } from "../../lib/queries/music";
+import { SongCardSkeleton } from "../Skeletons/SongCardSkeleton";
 
 export const RandomSongsSection: React.FC = () => {
   const { loadAndPlay } = useMusicActions();
@@ -24,9 +25,17 @@ export const RandomSongsSection: React.FC = () => {
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Random Songs</Text>
-        <GlassCard style={styles.emptyStateCard}>
-          <Text style={styles.emptyStateText}>Loading random songs...</Text>
-        </GlassCard>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.horizontalScroll}
+        >
+          {Array.from({ length: 6 }).map((_, i) => (
+            <View key={i} style={styles.songItem}>
+              <SongCardSkeleton />
+            </View>
+          ))}
+        </ScrollView>
       </View>
     );
   }

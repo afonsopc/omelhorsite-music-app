@@ -11,6 +11,7 @@ import { Album } from "../../services/MusicService";
 import { GlassCard } from "../ui/GlassContainer";
 import { useListAlbumsQuery } from "../../lib/queries/music";
 import { FsNode } from "../../services/FsNodeService";
+import { AlbumCardSkeleton } from "../Skeletons/AlbumCardSkeleton";
 
 export type AlbumCard = {
   album: Album;
@@ -33,9 +34,17 @@ export const RandomAlbumsSection = ({
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Albums for You</Text>
-        <GlassCard style={styles.loadingCard}>
-          <Text style={styles.loadingText}>Loading albums...</Text>
-        </GlassCard>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.horizontalScroll}
+        >
+          {Array.from({ length: 10 }).map((_, i) => (
+            <View key={i} style={styles.albumItem}>
+              <AlbumCardSkeleton />
+            </View>
+          ))}
+        </ScrollView>
       </View>
     );
   }

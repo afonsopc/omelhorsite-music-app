@@ -1,18 +1,10 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-} from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import TrackPlayer, {
   usePlaybackState,
   useProgress,
   useActiveTrack,
   State,
   Event,
-  RepeatMode as TPRepeatMode,
   AppKilledPlaybackBehavior,
   Capability,
 } from "react-native-track-player";
@@ -22,75 +14,11 @@ import {
   resetAndAddTracks,
   convertToTPRepeatMode,
 } from "../services/TrackPlayerService";
+import { MusicStateContext, useMusicState } from "./MusicStateProvider";
+import { MusicActionsContext, useMusicActions } from "./MusicActionsProvider";
+import { MusicPositionContext, useMusicPosition } from "./MusicPositionProvider";
 
-type MusicContextType = {
-  currentSong: Song | null;
-  isPlaying: boolean;
-  duration: number;
-  position: number;
-  queue: Song[];
-  currentIndex: number;
-  hasNext: boolean;
-  hasPrevious: boolean;
-
-  repeatMode: RepeatMode;
-  isShuffled: boolean;
-  playbackSpeed: PlaybackSpeed;
-
-  play: () => Promise<void>;
-  pause: () => Promise<void>;
-  togglePlay: () => Promise<void>;
-  seek: (position: number) => Promise<void>;
-  loadAndPlay: (song: Song, queue?: Song[]) => Promise<void>;
-  next: () => Promise<void>;
-  previous: () => Promise<void>;
-
-  toggleRepeat: () => Promise<void>;
-  toggleShuffle: () => Promise<void>;
-  setPlaybackSpeed: (speed: PlaybackSpeed) => Promise<void>;
-};
-
-const MusicContext = createContext<MusicContextType | undefined>(undefined);
-
-export const useMusic = () => {
-  const context = useContext(MusicContext);
-  if (!context) {
-    throw new Error("useMusic must be used within a MusicProvider");
-  }
-  return context;
-};
-
-export const useMusicState = useMusic;
-export const useMusicPosition = () => {
-  const { position, duration } = useMusic();
-  return { position, duration };
-};
-export const useMusicActions = () => {
-  const {
-    play,
-    pause,
-    togglePlay,
-    seek,
-    loadAndPlay,
-    next,
-    previous,
-    toggleRepeat,
-    toggleShuffle,
-    setPlaybackSpeed,
-  } = useMusic();
-  return {
-    play,
-    pause,
-    togglePlay,
-    seek,
-    loadAndPlay,
-    next,
-    previous,
-    toggleRepeat,
-    toggleShuffle,
-    setPlaybackSpeed,
-  };
-};
+export { useMusicState, useMusicActions, useMusicPosition };
 
 type MusicProviderProps = {
   children: React.ReactNode;
@@ -107,6 +35,8 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
   const [isShuffled, setIsShuffled] = useState<boolean>(false);
   const [playbackSpeed, setPlaybackSpeedState] = useState<PlaybackSpeed>(1.0);
   const [originalQueue, setOriginalQueue] = useState<Song[]>([]);
+  
+  const currentQueueIdsRef = useRef<string>("");
 
   const isPlaying =
     playbackState.state === State.Playing ||
@@ -199,20 +129,19 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
       const songIndex = songsToPlay.findIndex((s) => s.id === song.id);
       const startIndex = songIndex >= 0 ? songIndex : 0;
 
+      const newQueueIds = songsToPlay.map((s) => s.id).join(",");
+      const queueHasChanged = currentQueueIdsRef.current !== newQueueIds;
+
       setIsShuffled(false);
       setOriginalQueue(songsToPlay);
       setQueue(songsToPlay);
 
-      await resetAndAddTracks(songsToPlay);
-
-      const currentTrack = await TrackPlayer.getTrack(startIndex);
-      console.log("Track metadata after adding:", {
-        id: currentTrack?.id,
-        title: currentTrack?.title,
-        artist: currentTrack?.artist,
-        artwork: currentTrack?.artwork,
-        url: currentTrack?.url,
-      });
+      if (queueHasChanged) {
+        await TrackPlayer.reset();
+        const tracks = songsToPlay.map(Song.toTrack);
+        await TrackPlayer.setQueue(tracks);
+        currentQueueIdsRef.current = newQueueIds;
+      }
 
       if (startIndex > 0) {
         await TrackPlayer.skip(startIndex);
@@ -241,8 +170,17 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
   }, []);
 
   const togglePlay = useCallback(async () => {
-    await (isPlaying ? pause() : play());
-  }, [isPlaying, play, pause]);
+    try {
+      const state = await TrackPlayer.getPlaybackState();
+      if (state.state === State.Playing || state.state === State.Buffering) {
+        await TrackPlayer.pause();
+      } else {
+        await TrackPlayer.play();
+      }
+    } catch (error) {
+      console.error("Failed to toggle play:", error);
+    }
+  }, []);
 
   const seek = useCallback(async (position: number) => {
     try {
@@ -262,7 +200,8 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
 
   const previous = useCallback(async () => {
     try {
-      if (progress.position > 3) {
+      const currentPosition = await TrackPlayer.getProgress();
+      if (currentPosition.position > 3) {
         await TrackPlayer.seekTo(0);
       } else {
         await TrackPlayer.skipToPrevious();
@@ -270,7 +209,7 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
     } catch (error) {
       console.error("Failed to skip to previous:", error);
     }
-  }, [progress.position]);
+  }, []);
 
   const toggleRepeat = useCallback(async () => {
     const modes = [RepeatMode.Off, RepeatMode.All, RepeatMode.One];
@@ -294,6 +233,9 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
         setIsShuffled(true);
 
         await resetAndAddTracks(newQueue);
+        
+        currentQueueIdsRef.current = newQueue.map((s) => s.id).join(",");
+        
         await TrackPlayer.play();
       } else {
         const currentSongId = currentSong?.id;
@@ -305,6 +247,8 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
         setIsShuffled(false);
 
         await resetAndAddTracks(originalQueue);
+        
+        currentQueueIdsRef.current = originalQueue.map((s) => s.id).join(",");
 
         if (currentIndexInOriginal >= 0) {
           await TrackPlayer.skip(currentIndexInOriginal);
@@ -326,15 +270,12 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
     }
   }, []);
 
-  const hasNext = currentIndex < queue.length - 1;
-  const hasPrevious = currentIndex > 0;
+  const hasNext = useMemo(() => currentIndex < queue.length - 1, [currentIndex, queue.length]);
+  const hasPrevious = useMemo(() => currentIndex > 0, [currentIndex]);
 
-  const value = useMemo<MusicContextType>(
+  const stateValue = useMemo(
     () => ({
       currentSong,
-      isPlaying,
-      duration: progress.duration,
-      position: progress.position,
       queue,
       currentIndex,
       hasNext,
@@ -342,6 +283,21 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
       repeatMode,
       isShuffled,
       playbackSpeed,
+    }),
+    [
+      currentSong,
+      queue,
+      currentIndex,
+      hasNext,
+      hasPrevious,
+      repeatMode,
+      isShuffled,
+      playbackSpeed,
+    ],
+  );
+
+  const actionsValue = useMemo(
+    () => ({
       play,
       pause,
       togglePlay,
@@ -354,17 +310,6 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
       setPlaybackSpeed,
     }),
     [
-      currentSong,
-      isPlaying,
-      progress.duration,
-      progress.position,
-      queue,
-      currentIndex,
-      hasNext,
-      hasPrevious,
-      repeatMode,
-      isShuffled,
-      playbackSpeed,
       play,
       pause,
       togglePlay,
@@ -378,7 +323,22 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
     ],
   );
 
+  const positionValue = useMemo(
+    () => ({
+      position: progress.position,
+      duration: progress.duration,
+      isPlaying,
+    }),
+    [progress.position, progress.duration, isPlaying],
+  );
+
   return (
-    <MusicContext.Provider value={value}>{children}</MusicContext.Provider>
+    <MusicStateContext.Provider value={stateValue}>
+      <MusicActionsContext.Provider value={actionsValue}>
+        <MusicPositionContext.Provider value={positionValue}>
+          {children}
+        </MusicPositionContext.Provider>
+      </MusicActionsContext.Provider>
+    </MusicStateContext.Provider>
   );
 };
