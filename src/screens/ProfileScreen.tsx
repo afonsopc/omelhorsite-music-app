@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,15 +6,30 @@ import {
   StyleSheet,
   TouchableOpacity,
   Platform,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { GlassCard, GlassButton } from "../components/ui/GlassContainer";
 import { useGetCurrentSessionQuery } from "../lib/queries/accounts";
 import { Session } from "../services/AccountService";
+import { clearImageCache, getCacheSize, formatBytes } from "../config/imageCache";
 
 export const ProfileScreen: React.FC = () => {
   const { data: session } = useGetCurrentSessionQuery();
   const currentUser = session?.user;
+  const [cacheSize, setCacheSize] = useState<number>(-1);
+  const [isClearing, setIsClearing] = useState(false);
+
+  const loadCacheSize = async () => {
+    const size = await getCacheSize();
+    setCacheSize(size);
+  };
+
+  // Load cache size on mount
+  React.useEffect(() => {
+    loadCacheSize();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -22,6 +37,40 @@ export const ProfileScreen: React.FC = () => {
     } catch (error) {
       console.error("Logout failed:", error);
     }
+  };
+
+  const handleClearCache = () => {
+    Alert.alert(
+      "Clear Image Cache",
+      `This will clear all cached images${cacheSize >= 0 ? ` (${formatBytes(cacheSize)})` : ""}. Images will be re-downloaded when needed.\n\nDo you want to continue?`,
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Clear Cache",
+          style: "destructive",
+          onPress: async () => {
+            setIsClearing(true);
+            try {
+              const success = await clearImageCache();
+              if (success) {
+                Alert.alert("Success", "Image cache cleared successfully");
+                await loadCacheSize();
+              } else {
+                Alert.alert("Error", "Failed to clear image cache");
+              }
+            } catch (error) {
+              console.error("Error clearing cache:", error);
+              Alert.alert("Error", "An error occurred while clearing cache");
+            } finally {
+              setIsClearing(false);
+            }
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -89,6 +138,29 @@ export const ProfileScreen: React.FC = () => {
               <Text style={styles.settingDescription}>
                 Data and privacy settings
               </Text>
+            </GlassCard>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.settingItem}
+            onPress={handleClearCache}
+            disabled={isClearing}
+          >
+            <GlassCard style={styles.settingCard}>
+              <View style={styles.settingWithAction}>
+                <View style={styles.settingInfo}>
+                  <Text style={styles.settingTitle}>Image Cache</Text>
+                  <Text style={styles.settingDescription}>
+                    {cacheSize >= 0
+                      ? `Currently using ${formatBytes(cacheSize)}`
+                      : "Cache size unavailable"}
+                  </Text>
+                </View>
+                {isClearing && (
+                  <ActivityIndicator size="small" color="#FF6B6B" />
+                )}
+              </View>
+              <Text style={styles.clearCacheHint}>Tap to clear cache</Text>
             </GlassCard>
           </TouchableOpacity>
         </View>
@@ -187,6 +259,15 @@ const styles = StyleSheet.create({
   settingCard: {
     padding: 16,
   },
+  settingWithAction: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  settingInfo: {
+    flex: 1,
+  },
   settingTitle: {
     fontSize: 16,
     fontWeight: "600",
@@ -196,6 +277,11 @@ const styles = StyleSheet.create({
   settingDescription: {
     fontSize: 14,
     color: "rgba(255, 255, 255, 0.6)",
+  },
+  clearCacheHint: {
+    fontSize: 12,
+    color: "rgba(255, 107, 107, 0.8)",
+    marginTop: 4,
   },
   logoutSection: {
     paddingHorizontal: 24,

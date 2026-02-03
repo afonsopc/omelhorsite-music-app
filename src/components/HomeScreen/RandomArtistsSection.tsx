@@ -4,8 +4,8 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
 } from "react-native";
+import { Image } from "expo-image";
 import { GlassCard } from "../ui/GlassContainer";
 import {
   useArtitstPictureQuery,
@@ -38,7 +38,9 @@ const ArtistCard = ({
           <Image
             source={{ uri: artistPicturesQuery.data }}
             style={styles.artistArtwork}
-            resizeMode="cover"
+            contentFit="cover"
+            cachePolicy="disk"
+            transition={200}
           />
         ) : (
           <View style={styles.artistArtworkPlaceholder}>

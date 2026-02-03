@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
+import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { GlassButton } from "../ui/GlassContainer";
 
@@ -22,7 +23,9 @@ export const AlbumHeader = ({
           <Image
             source={{ uri: artworkUrl }}
             style={styles.heroImage}
-            resizeMode="cover"
+            contentFit="cover"
+            cachePolicy="disk"
+            transition={200}
           />
         ) : (
           <View style={styles.heroPlaceholder}>

@@ -1,7 +1,7 @@
 import React from "react";
-import { View, StyleSheet, Image } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
+import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import { Text } from "react-native";
 
 export const PlayerArtwork = ({
   artworkUrl,
@@ -16,7 +16,9 @@ export const PlayerArtwork = ({
         <Image
           source={{ uri: artworkUrl }}
           style={styles.artwork}
-          resizeMode="cover"
+          contentFit="cover"
+          cachePolicy="disk"
+          transition={200}
         />
       ) : (
         <LinearGradient

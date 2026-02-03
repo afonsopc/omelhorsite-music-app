@@ -5,8 +5,8 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
 } from "react-native";
+import { Image } from "expo-image";
 import { Album } from "../../services/MusicService";
 import { GlassCard } from "../ui/GlassContainer";
 import { useListAlbumsQuery } from "../../lib/queries/music";
@@ -64,7 +64,9 @@ export const RandomAlbumsSection = ({
                   <Image
                     source={{ uri: FsNode.dataUrl(entry.artwork_fs_node_id) }}
                     style={styles.albumArtwork}
-                    resizeMode="cover"
+                    contentFit="cover"
+                    cachePolicy="disk"
+                    transition={200}
                   />
                 ) : (
                   <View style={styles.albumArtworkPlaceholder}>

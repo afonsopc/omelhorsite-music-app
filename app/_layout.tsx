@@ -3,13 +3,14 @@ import { StatusBar } from "expo-status-bar";
 import { AuthProvider } from "../src/providers/AuthProvider";
 import { MusicProvider } from "../src/providers/MusicProvider";
 import { QueryProvider } from "../src/providers/QueryProvider";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { View, Modal, Platform } from "react-native";
 import { MusicPlayerBar } from "../src/components/player/MusicPlayerBar";
 import { useMusicState } from "../src/providers/MusicProvider";
 import { FullPlayer } from "../src/components/fullPlayer";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { TabBarProvider, useTabBar } from "../src/providers/TabBarProvider";
+import { initializeImageCache } from "../src/config/imageCache";
 
 const MusicPlayerModal = () => {
   const { currentSong } = useMusicState();
@@ -49,6 +50,11 @@ const MusicPlayerModal = () => {
 };
 
 export default function RootLayout() {
+  useEffect(() => {
+    // Initialize image cache on app startup
+    initializeImageCache();
+  }, []);
+
   return (
     <QueryProvider>
       <AuthProvider>

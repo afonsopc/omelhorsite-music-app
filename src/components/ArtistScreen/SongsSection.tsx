@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { Image } from "expo-image";
 import { Song } from "../../services/MusicService";
 import { GlassCard } from "../ui/GlassContainer";
 
@@ -45,7 +46,9 @@ export const SongsSection = ({
                   <Image
                     source={{ uri: artworkUrl }}
                     style={styles.songArtwork}
-                    resizeMode="cover"
+                    contentFit="cover"
+                    cachePolicy="disk"
+                    transition={200}
                   />
                 ) : (
                   <View style={styles.songArtworkPlaceholder}>

@@ -4,8 +4,8 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
 } from "react-native";
+import { Image } from "expo-image";
 import { Album } from "../../services/MusicService";
 import { GlassCard } from "../ui/GlassContainer";
 import { FsNode } from "../../services/FsNodeService";
@@ -47,7 +47,9 @@ export const AlbumsSection = ({
                     uri: FsNode.dataUrl(album.artwork_fs_node_id),
                   }}
                   style={styles.albumArtwork}
-                  resizeMode="cover"
+                  contentFit="cover"
+                  cachePolicy="disk"
+                  transition={200}
                 />
               ) : (
                 <View style={styles.albumArtworkPlaceholder}>

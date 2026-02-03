@@ -4,10 +4,10 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  Image,
   StyleProp,
   ViewStyle,
 } from "react-native";
+import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { GlassContainer } from "../../components/ui/GlassContainer";
 import { useMusic } from "../../providers/MusicProvider";
@@ -46,7 +46,9 @@ export const MusicPlayerBar = ({
               <Image
                 source={{ uri: artworkUrl }}
                 style={styles.artwork}
-                resizeMode="cover"
+                contentFit="cover"
+                cachePolicy="disk"
+                transition={200}
               />
             ) : (
               <View style={styles.artworkPlaceholder}>

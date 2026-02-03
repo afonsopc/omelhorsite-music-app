@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
+import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { GlassButton } from "../ui/GlassContainer";
 import { useArtitstPictureQuery } from "../../lib/queries/music";
@@ -26,7 +27,9 @@ export const ArtistHeader = ({
           <Image
             source={{ uri: heroImage }}
             style={styles.heroImage}
-            resizeMode="cover"
+            contentFit="cover"
+            cachePolicy="disk"
+            transition={200}
           />
         ) : (
           <View style={styles.heroPlaceholder}>
