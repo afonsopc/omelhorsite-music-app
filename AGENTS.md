@@ -35,6 +35,10 @@ npm run web            # Web browser
 - ❌ Never modify provider hierarchy order (QueryProvider must be outermost)
 - ❌ Never bypass authentication checks (use `useAuth()` hook)
 - ❌ Never modify TrackPlayer setup outside `MusicProvider` or `TrackPlayerService`
+- ❌ Never use `function` keyword - use arrow functions with `const` instead
+- ❌ Never use `React.FC` type annotation
+- ❌ Never use `interface` - use `type` keyword instead
+- ❌ Avoid explicit return types on functions (let TypeScript infer them)
 
 ## System Architecture Map
 
@@ -302,16 +306,41 @@ export function FeaturedSection({ songs }: { songs: Song[] }) {
 
 **Strict mode enabled** - All files must satisfy strict type checking
 
-**Type all the things:**
+**Function and Component Style:**
 ```typescript
-// Function signatures
+// ✅ Arrow functions with const (let TypeScript infer return type)
+const playSong = async (songId: string) => {
+  await TrackPlayerService.addTrack(track);
+  // Return type Promise<void> is inferred
+};
+
+// ❌ Never use function keyword
 function playSong(songId: string): Promise<void> { }
 
-// Component props
-interface SongCardProps {
+// ❌ Avoid explicit return types (only use when necessary)
+const playSong = async (songId: string): Promise<void> => { };
+
+// ✅ Inline props for single-use components
+export const SongCard = ({ song, onPress }: { song: Song; onPress?: () => void }) => {
+  return <Pressable onPress={onPress}>...</Pressable>;
+};
+
+// ✅ Use "type" keyword for named props (never "interface")
+type SongCardProps = {
   song: Song;
   onPress?: () => void;
+};
+export const SongCard = ({ song, onPress }: SongCardProps) => {
+  return <Pressable onPress={onPress}>...</Pressable>;
+};
+
+// ❌ Never use interface keyword
+interface SongCardProps {
+  song: Song;
 }
+
+// ❌ Never use React.FC
+const SongCard: React.FC<SongCardProps> = ({ song }) => { };
 
 // API responses (use type guards)
 if (Song.is(response.data)) {
