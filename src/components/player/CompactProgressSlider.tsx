@@ -1,14 +1,16 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import Slider from "@react-native-community/slider";
-import { useMusicPosition } from "../../providers/MusicProvider";
 
-export const PlayerProgress = ({
+export const CompactProgressSlider = ({
+  position,
+  duration,
   onSeek,
 }: {
+  position: number;
+  duration: number;
   onSeek: (position: number) => Promise<void>;
 }) => {
-  const { position, duration } = useMusicPosition();
   const [isSeeking, setIsSeeking] = useState(false);
   const [seekPosition, setSeekPosition] = useState(0);
   const seekTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -22,12 +24,6 @@ export const PlayerProgress = ({
       }
     };
   }, []);
-
-  const formatDuration = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
 
   const handleSlidingStart = () => {
     setIsSeeking(true);
@@ -55,7 +51,7 @@ export const PlayerProgress = ({
   };
 
   return (
-    <View style={styles.progressContainer}>
+    <View style={styles.container}>
       <Slider
         style={styles.slider}
         minimumValue={0}
@@ -68,30 +64,18 @@ export const PlayerProgress = ({
         maximumTrackTintColor="rgba(255, 255, 255, 0.2)"
         thumbTintColor="#FFFFFF"
       />
-      <View style={styles.timeContainer}>
-        <Text style={styles.timeText}>{formatDuration(displayPosition)}</Text>
-        <Text style={styles.timeText}>{formatDuration(duration)}</Text>
-      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  progressContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 40,
+  container: {
+    width: "100%",
+    height: 24,
+    justifyContent: "center",
   },
   slider: {
     width: "100%",
-    height: 40,
-  },
-  timeContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: -8,
-  },
-  timeText: {
-    fontSize: 12,
-    color: "rgba(255, 255, 255, 0.6)",
+    height: 24,
   },
 });

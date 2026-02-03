@@ -8,7 +8,7 @@ import {
 import { Image } from "expo-image";
 import { useMusicActions } from "../../providers/MusicProvider";
 import { Song } from "../../services/MusicService";
-import { GlassCard } from "../ui/GlassContainer";
+import { Card } from "../ui/Card";
 import { useListSongsQuery } from "../../lib/queries/music";
 import { SongCardSkeleton } from "../Skeletons/SongCardSkeleton";
 
@@ -44,9 +44,9 @@ export const RandomSongsSection: React.FC = () => {
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Random Songs</Text>
-        <GlassCard style={styles.emptyStateCard}>
+        <Card style={styles.emptyStateCard}>
           <Text style={styles.emptyStateText}>No random songs found</Text>
-        </GlassCard>
+        </Card>
       </View>
     );
   }
@@ -68,7 +68,7 @@ export const RandomSongsSection: React.FC = () => {
               style={styles.songItem}
               onPress={() => loadAndPlay(song, randomSongsQuery.data)}
             >
-              <GlassCard style={styles.songCard}>
+              <Card style={styles.songCard}>
                 {artworkUrl ? (
                   <Image
                     source={{ uri: artworkUrl }}
@@ -92,7 +92,7 @@ export const RandomSongsSection: React.FC = () => {
                     {song.artist || "Unknown Artist"}
                   </Text>
                 </View>
-              </GlassCard>
+              </Card>
             </TouchableOpacity>
           );
         })}

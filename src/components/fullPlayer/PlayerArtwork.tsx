@@ -22,7 +22,7 @@ export const PlayerArtwork = ({
         />
       ) : (
         <LinearGradient
-          colors={["#FF6B6B", "#4ECDC4"]}
+          colors={["#00f2ff", "#4ECDC4"]}
           style={styles.artworkPlaceholder}
         >
           <Text style={styles.artworkText}>

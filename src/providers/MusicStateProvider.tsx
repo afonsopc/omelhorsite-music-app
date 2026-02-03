@@ -11,6 +11,7 @@ type MusicStateContextType = {
   repeatMode: RepeatMode;
   isShuffled: boolean;
   playbackSpeed: PlaybackSpeed;
+  volume: number;
 };
 
 export const MusicStateContext = createContext<MusicStateContextType | undefined>(undefined);

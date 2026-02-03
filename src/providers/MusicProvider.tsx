@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import TrackPlayer, {
   usePlaybackState,
   useProgress,
@@ -34,6 +34,7 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
   const [repeatMode, setRepeatMode] = useState<RepeatMode>(RepeatMode.Off);
   const [isShuffled, setIsShuffled] = useState<boolean>(false);
   const [playbackSpeed, setPlaybackSpeedState] = useState<PlaybackSpeed>(1.0);
+  const [volume, setVolumeState] = useState<number>(1.0);
   const [originalQueue, setOriginalQueue] = useState<Song[]>([]);
   
   const currentQueueIdsRef = useRef<string>("");
@@ -123,7 +124,7 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
     updateRepeatMode();
   }, [repeatMode]);
 
-  const loadAndPlay = useCallback(async (song: Song, newQueue?: Song[]) => {
+  const loadAndPlay = async (song: Song, newQueue?: Song[]) => {
     try {
       const songsToPlay = newQueue && newQueue.length > 0 ? newQueue : [song];
       const songIndex = songsToPlay.findIndex((s) => s.id === song.id);
@@ -151,25 +152,25 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
     } catch (error) {
       console.error("Failed to load and play:", error);
     }
-  }, []);
+  };
 
-  const play = useCallback(async () => {
+  const play = async () => {
     try {
       await TrackPlayer.play();
     } catch (error) {
       console.error("Failed to play:", error);
     }
-  }, []);
+  };
 
-  const pause = useCallback(async () => {
+  const pause = async () => {
     try {
       await TrackPlayer.pause();
     } catch (error) {
       console.error("Failed to pause:", error);
     }
-  }, []);
+  };
 
-  const togglePlay = useCallback(async () => {
+  const togglePlay = async () => {
     try {
       const state = await TrackPlayer.getPlaybackState();
       if (state.state === State.Playing || state.state === State.Buffering) {
@@ -180,25 +181,25 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
     } catch (error) {
       console.error("Failed to toggle play:", error);
     }
-  }, []);
+  };
 
-  const seek = useCallback(async (position: number) => {
+  const seek = async (position: number) => {
     try {
       await TrackPlayer.seekTo(position);
     } catch (error) {
       console.error("Failed to seek:", error);
     }
-  }, []);
+  };
 
-  const next = useCallback(async () => {
+  const next = async () => {
     try {
       await TrackPlayer.skipToNext();
     } catch (error) {
       console.error("Failed to skip to next:", error);
     }
-  }, []);
+  };
 
-  const previous = useCallback(async () => {
+  const previous = async () => {
     try {
       const currentPosition = await TrackPlayer.getProgress();
       if (currentPosition.position > 3) {
@@ -209,16 +210,16 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
     } catch (error) {
       console.error("Failed to skip to previous:", error);
     }
-  }, []);
+  };
 
-  const toggleRepeat = useCallback(async () => {
+  const toggleRepeat = async () => {
     const modes = [RepeatMode.Off, RepeatMode.All, RepeatMode.One];
     const currentModeIndex = modes.indexOf(repeatMode);
     const nextMode = modes[(currentModeIndex + 1) % modes.length];
     setRepeatMode(nextMode);
-  }, [repeatMode]);
+  };
 
-  const toggleShuffle = useCallback(async () => {
+  const toggleShuffle = async () => {
     try {
       if (!isShuffled) {
         const currentSongId = currentSong?.id;
@@ -259,16 +260,26 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
     } catch (error) {
       console.error("Failed to toggle shuffle:", error);
     }
-  }, [isShuffled, queue, originalQueue, currentSong]);
+  };
 
-  const setPlaybackSpeed = useCallback(async (speed: PlaybackSpeed) => {
+  const setPlaybackSpeed = async (speed: PlaybackSpeed) => {
     try {
       await TrackPlayer.setRate(speed);
       setPlaybackSpeedState(speed);
     } catch (error) {
       console.error("Failed to set playback speed:", error);
     }
-  }, []);
+  };
+
+  const setVolume = async (newVolume: number) => {
+    try {
+      const clampedVolume = Math.max(0, Math.min(1, newVolume));
+      await TrackPlayer.setVolume(clampedVolume);
+      setVolumeState(clampedVolume);
+    } catch (error) {
+      console.error("Failed to set volume:", error);
+    }
+  };
 
   const hasNext = useMemo(() => currentIndex < queue.length - 1, [currentIndex, queue.length]);
   const hasPrevious = useMemo(() => currentIndex > 0, [currentIndex]);
@@ -283,6 +294,7 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
       repeatMode,
       isShuffled,
       playbackSpeed,
+      volume,
     }),
     [
       currentSong,
@@ -293,6 +305,7 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
       repeatMode,
       isShuffled,
       playbackSpeed,
+      volume,
     ],
   );
 
@@ -308,19 +321,9 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
       toggleRepeat,
       toggleShuffle,
       setPlaybackSpeed,
+      setVolume,
     }),
-    [
-      play,
-      pause,
-      togglePlay,
-      seek,
-      loadAndPlay,
-      next,
-      previous,
-      toggleRepeat,
-      toggleShuffle,
-      setPlaybackSpeed,
-    ],
+    [repeatMode, isShuffled, queue, originalQueue, currentSong],
   );
 
   const positionValue = useMemo(

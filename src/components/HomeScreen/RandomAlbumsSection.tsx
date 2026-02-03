@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { Image } from "expo-image";
 import { Album } from "../../services/MusicService";
-import { GlassCard } from "../ui/GlassContainer";
+import { Card } from "../ui/Card";
 import { useListAlbumsQuery } from "../../lib/queries/music";
 import { FsNode } from "../../services/FsNodeService";
 import { AlbumCardSkeleton } from "../Skeletons/AlbumCardSkeleton";
@@ -68,7 +68,7 @@ export const RandomAlbumsSection = ({
               style={styles.albumItem}
               onPress={() => onAlbumPress(albumName, entry.artist || "")}
             >
-              <GlassCard style={styles.albumCard}>
+              <Card style={styles.albumCard}>
                 {entry.artwork_fs_node_id ? (
                   <Image
                     source={{ uri: FsNode.dataUrl(entry.artwork_fs_node_id) }}
@@ -90,7 +90,7 @@ export const RandomAlbumsSection = ({
                 <Text style={styles.albumArtist} numberOfLines={1}>
                   {entry.artist || "Unknown Artist"}
                 </Text>
-              </GlassCard>
+              </Card>
             </TouchableOpacity>
           );
         })}

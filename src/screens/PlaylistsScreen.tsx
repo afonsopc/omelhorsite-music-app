@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { GlassCard, GlassButton } from "../components/ui/GlassContainer";
+import { Card, Button } from "../components/ui/Card";
 import { Playlist } from "../services/MusicService";
 
 export const PlaylistsScreen: React.FC = () => {

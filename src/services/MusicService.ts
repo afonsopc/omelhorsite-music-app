@@ -55,10 +55,7 @@ export type Album = {
 
 export const Song = {
   list: (filters: ListFilters<Song> = {}) =>
-    backend<Song[]>("songs", "GET", filters).then((response) => {
-      console.log("Song.list response:", response);
-      return response.data;
-    }),
+    backend<Song[]>("songs", "GET", filters).then((response) => response.data),
   get: (id: Song["id"]) =>
     backend<Song>(`songs/${id}`, "GET").then((response) => response.data),
   update: (id: Song["id"], data: Partial<Song>) =>

@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Song } from "../../services/MusicService";
-import { GlassCard } from "../ui/GlassContainer";
+import { Card } from "../ui/Card";
 
 const formatDuration = (seconds: number): string => {
   const mins = Math.floor(seconds / 60);
@@ -17,11 +17,11 @@ export const TracksSection = ({
 }) => {
   if (songs.length === 0) {
     return (
-      <GlassCard style={styles.emptyStateCard}>
+      <Card style={styles.emptyStateCard}>
         <Text style={styles.emptyStateText}>
           No songs found for this album.
         </Text>
-      </GlassCard>
+      </Card>
     );
   }
 
@@ -34,7 +34,7 @@ export const TracksSection = ({
           style={styles.songItem}
           onPress={() => onSongPress(song)}
         >
-          <GlassCard style={styles.songCard}>
+          <Card style={styles.songCard}>
             <View style={styles.songContent}>
               <View style={styles.trackNumber}>
                 <Text style={styles.trackNumberText}>
@@ -53,7 +53,7 @@ export const TracksSection = ({
                 {formatDuration(song.duration)}
               </Text>
             </View>
-          </GlassCard>
+          </Card>
         </TouchableOpacity>
       ))}
     </View>

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Song } from "../../services/MusicService";
+import { Song, search } from "../../services/MusicService";
 import { ListFilters } from "../../services/BackendService";
 
 export const LIST_SONGS = "listSongs";
@@ -10,6 +10,7 @@ export const LIST_PLAYLISTS = "listPlaylists";
 export const GET_PLAYLIST = "getPlaylist";
 export const LIST_PLAYLIST_SONGS = "listPlaylistSongs";
 export const LIST_ARTIST_PICTURES = "listArtistPictures";
+export const SEARCH = "search";
 
 const query = <T>(
   queryKey: string,
@@ -124,4 +125,15 @@ export const useDeleteSongMutation = () => {
       queryClient.invalidateQueries({ queryKey: [LIST_ALBUMS] });
     },
   });
+};
+
+export const useSearchQuery = (
+  searchTerm: string,
+  options?: { enabled?: boolean },
+) => {
+  return query(
+    SEARCH + searchTerm,
+    () => search(searchTerm),
+    options,
+  );
 };

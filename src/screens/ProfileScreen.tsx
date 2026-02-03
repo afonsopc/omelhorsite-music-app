@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { GlassCard, GlassButton } from "../components/ui/GlassContainer";
+import { Card, Button } from "../components/ui/Card";
 import { useGetCurrentSessionQuery } from "../lib/queries/accounts";
 import { Session } from "../services/AccountService";
 import {
@@ -88,7 +88,7 @@ export const ProfileScreen: React.FC = () => {
           <Text style={styles.headerSubtitle}>Your account settings</Text>
         </View>
 
-        <GlassCard style={styles.profileCard}>
+        <Card style={styles.profileCard}>
           <View style={styles.profileHeader}>
             <View style={styles.avatarContainer}>
               <View style={styles.avatarPlaceholder}>
@@ -104,45 +104,45 @@ export const ProfileScreen: React.FC = () => {
               <Text style={styles.userEmail}>{currentUser?.email}</Text>
             </View>
           </View>
-        </GlassCard>
+        </Card>
 
         <View style={styles.settingsSection}>
           <Text style={styles.sectionTitle}>Settings</Text>
 
           <TouchableOpacity style={styles.settingItem}>
-            <GlassCard style={styles.settingCard}>
+            <Card style={styles.settingCard}>
               <Text style={styles.settingTitle}>Audio Quality</Text>
               <Text style={styles.settingDescription}>
                 High Quality (320kbps)
               </Text>
-            </GlassCard>
+            </Card>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.settingItem}>
-            <GlassCard style={styles.settingCard}>
+            <Card style={styles.settingCard}>
               <Text style={styles.settingTitle}>Downloads</Text>
               <Text style={styles.settingDescription}>
                 Manage offline music
               </Text>
-            </GlassCard>
+            </Card>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.settingItem}>
-            <GlassCard style={styles.settingCard}>
+            <Card style={styles.settingCard}>
               <Text style={styles.settingTitle}>Notifications</Text>
               <Text style={styles.settingDescription}>
                 Push and email preferences
               </Text>
-            </GlassCard>
+            </Card>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.settingItem}>
-            <GlassCard style={styles.settingCard}>
+            <Card style={styles.settingCard}>
               <Text style={styles.settingTitle}>Privacy</Text>
               <Text style={styles.settingDescription}>
                 Data and privacy settings
               </Text>
-            </GlassCard>
+            </Card>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -150,7 +150,7 @@ export const ProfileScreen: React.FC = () => {
             onPress={handleClearCache}
             disabled={isClearing}
           >
-            <GlassCard style={styles.settingCard}>
+            <Card style={styles.settingCard}>
               <View style={styles.settingWithAction}>
                 <View style={styles.settingInfo}>
                   <Text style={styles.settingTitle}>Image Cache</Text>
@@ -161,22 +161,21 @@ export const ProfileScreen: React.FC = () => {
                   </Text>
                 </View>
                 {isClearing && (
-                  <ActivityIndicator size="small" color="#FF6B6B" />
+                  <ActivityIndicator size="small" color="#00f2ff" />
                 )}
               </View>
               <Text style={styles.clearCacheHint}>Tap to clear cache</Text>
-            </GlassCard>
+            </Card>
           </TouchableOpacity>
         </View>
 
         <View style={styles.logoutSection}>
-          <GlassButton
+          <Button
             style={styles.logoutButton}
             onPress={handleLogout}
-            tint="dark"
           >
             <Text style={styles.logoutButtonText}>Sign Out</Text>
-          </GlassButton>
+          </Button>
         </View>
 
         <View style={{ height: 100 }} />
@@ -223,14 +222,14 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: "rgba(255, 107, 107, 0.3)",
+    backgroundColor: "rgba(0, 54, 138, 0.3)",
     justifyContent: "center",
     alignItems: "center",
   },
   avatarText: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#FF6B6B",
+    color: "#00f2ff",
   },
   userInfo: {
     flex: 1,
@@ -297,6 +296,6 @@ const styles = StyleSheet.create({
   logoutButtonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#FF6B6B",
+    color: "#00f2ff",
   },
 });

@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Image } from "expo-image";
-import { GlassCard } from "../ui/GlassContainer";
+import { Card } from "../ui/Card";
 import {
   useArtitstPictureQuery,
   useListArtistsQuery,
@@ -34,7 +34,7 @@ const ArtistCard = ({
       style={styles.artistItem}
       onPress={() => onArtistPress(artist)}
     >
-      <GlassCard style={styles.artistCard}>
+      <Card style={styles.artistCard}>
         {artistPicturesQuery.data && artistPicturesQuery.data[0] ? (
           <Image
             source={{ uri: artistPicturesQuery.data }}
@@ -53,7 +53,7 @@ const ArtistCard = ({
         <Text style={styles.artistName} numberOfLines={1}>
           {artist}
         </Text>
-      </GlassCard>
+      </Card>
     </TouchableOpacity>
   );
 };
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     height: 96,
     borderRadius: 48,
     marginBottom: 12,
-    backgroundColor: "rgba(255, 107, 107, 0.25)",
+    backgroundColor: "rgba(0, 54, 138, 0.25)",
     justifyContent: "center",
     alignItems: "center",
   },

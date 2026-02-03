@@ -11,7 +11,11 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { useMusicState, useMusicPosition, useMusicActions } from "../../providers/MusicProvider";
+import {
+  useMusicState,
+  useMusicPosition,
+  useMusicActions,
+} from "../../providers/MusicProvider";
 import { Song } from "../../services/MusicService";
 import { PLAYBACK_SPEEDS, PlaybackSpeed } from "../../types/player";
 import { PlayerHeader } from "./PlayerHeader";
@@ -241,9 +245,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   speedOptionActive: {
-    backgroundColor: "rgba(255, 107, 107, 0.2)",
-    borderWidth: 2,
-    borderColor: "#FF6B6B",
+    backgroundColor: "rgba(0, 54, 138, 0.2)",
+    borderRadius: 12,
+    borderColor: "#00f2ff",
   },
   speedOptionText: {
     fontSize: 18,
@@ -251,7 +255,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   speedOptionTextActive: {
-    color: "#FF6B6B",
+    color: "#00f2ff",
     fontWeight: "600",
   },
 });

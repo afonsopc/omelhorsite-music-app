@@ -59,7 +59,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
           <Ionicons
             name={isShuffled ? "shuffle" : "shuffle-outline"}
             size={24}
-            color={isShuffled ? "#FF6B6B" : "#FFFFFF"}
+            color={isShuffled ? "#00f2ff" : "#FFFFFF"}
           />
         </Pressable>
 
@@ -73,7 +73,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
           <Ionicons
             name={getRepeatIcon() as any}
             size={24}
-            color={isRepeatActive ? "#FF6B6B" : "#FFFFFF"}
+            color={isRepeatActive ? "#00f2ff" : "#FFFFFF"}
           />
         </Pressable>
       </View>
@@ -104,7 +104,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
           <Ionicons
             name={isPlaying ? "pause" : "play"}
             size={36}
-            color="#FF6B6B"
+            color="#00f2ff"
           />
         </Pressable>
 
@@ -168,19 +168,19 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   playButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: "rgba(255, 107, 107, 0.2)",
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: "rgba(0, 54, 138, 0.2)",
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 2,
-    borderColor: "#FF6B6B",
-    marginHorizontal: 30,
+    borderColor: "#00f2ff",
   },
   playButtonPressed: {
+    transform: [{ scale: 0.95 }],
     opacity: 0.7,
-    backgroundColor: "rgba(255, 107, 107, 0.3)",
+    backgroundColor: "rgba(0, 54, 138, 0.3)",
   },
   speedControl: {
     alignItems: "center",

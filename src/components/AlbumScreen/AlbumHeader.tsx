@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
-import { GlassButton } from "../ui/GlassContainer";
+import { Button } from "../ui/Card";
 
 export const AlbumHeader = ({
   albumName,
@@ -41,10 +41,10 @@ export const AlbumHeader = ({
         {artistName} · {songCount} songs
       </Text>
 
-      <GlassButton style={styles.playAllButton} onPress={onPlayAll}>
-        <Ionicons name="play" size={20} color="#FF6B6B" />
+      <Button style={styles.playAllButton} onPress={onPlayAll}>
+        <Ionicons name="play" size={20} color="#00f2ff" />
         <Text style={styles.playAllText}>Play</Text>
-      </GlassButton>
+      </Button>
     </View>
   );
 };

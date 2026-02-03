@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import { Image } from "expo-image";
 import { Album } from "../../services/MusicService";
-import { GlassCard } from "../ui/GlassContainer";
+import { Card } from "../ui/Card";
 import { FsNode } from "../../services/FsNodeService";
 
 export const AlbumsSection = ({
@@ -40,7 +40,7 @@ export const AlbumsSection = ({
               )
             }
           >
-            <GlassCard style={styles.albumCard}>
+            <Card style={styles.albumCard}>
               {album.artwork_fs_node_id ? (
                 <Image
                   source={{
@@ -61,7 +61,7 @@ export const AlbumsSection = ({
               <Text style={styles.albumName} numberOfLines={1}>
                 {album.name || "Unknown Album"}
               </Text>
-            </GlassCard>
+            </Card>
           </TouchableOpacity>
         ))}
       </ScrollView>

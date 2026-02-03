@@ -9,11 +9,10 @@ import {
   Alert,
 } from "react-native";
 import {
-  GlassContainer,
-  GlassCard,
-  GlassInput,
-  GlassButton,
-} from "../components/ui/GlassContainer";
+  Card,
+  Input,
+  Button,
+} from "../components/ui/Card";
 import { useAuth } from "../providers/AuthProvider";
 
 export const AuthScreen = ({}: {}) => {
@@ -56,14 +55,14 @@ export const AuthScreen = ({}: {}) => {
             <Text style={styles.appSubtitle}>Your personal music library</Text>
           </View>
 
-          <GlassCard style={styles.loginCard}>
+          <Card style={styles.loginCard}>
             <Text style={styles.loginTitle}>Welcome Back</Text>
             <Text style={styles.loginSubtitle}>
               Sign in to access your music
             </Text>
 
             <View style={styles.formContainer}>
-              <GlassInput
+              <Input
                 placeholder="Email"
                 value={email}
                 onChangeText={setEmail}
@@ -73,7 +72,7 @@ export const AuthScreen = ({}: {}) => {
                 children={undefined}
               />
 
-              <GlassInput
+              <Input
                 placeholder="Password"
                 value={password}
                 onChangeText={setPassword}
@@ -82,29 +81,27 @@ export const AuthScreen = ({}: {}) => {
                 children={undefined}
               />
 
-              <GlassButton
+              <Button
                 style={styles.loginButton}
                 onPress={handleLogin}
-                disabled={isLoading}
-                tint="accent"
               >
                 <Text style={styles.loginButtonText}>
                   {isLoading ? "Signing In..." : "Sign In"}
                 </Text>
-              </GlassButton>
+              </Button>
             </View>
 
             <TouchableOpacity style={styles.forgotPasswordButton}>
               <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
             </TouchableOpacity>
-          </GlassCard>
+          </Card>
 
-          <GlassContainer style={styles.demoInfoCard} intensity="subtle">
+          <View style={styles.demoInfoCard}>
             <Text style={styles.demoInfoTitle}>Demo Mode</Text>
             <Text style={styles.demoInfoText}>
               Use your existing account credentials from the web app
             </Text>
-          </GlassContainer>
+          </View>
         </View>
       </KeyboardAvoidingView>
     </View>
@@ -217,7 +214,7 @@ const styles = StyleSheet.create({
   errorTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#FF6B6B",
+    color: "#00f2ff",
     marginBottom: 8,
   },
   errorText: {
@@ -231,7 +228,7 @@ const styles = StyleSheet.create({
   },
   retryText: {
     fontSize: 14,
-    color: "#FF6B6B",
+    color: "#00f2ff",
     fontWeight: "600",
   },
   successCard: {

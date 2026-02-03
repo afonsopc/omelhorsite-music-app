@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
-import { GlassButton } from "../ui/GlassContainer";
+import { Button } from "../ui/Card";
 import { useArtitstPictureQuery } from "../../lib/queries/music";
 
 export const ArtistHeader = ({
@@ -45,10 +45,10 @@ export const ArtistHeader = ({
         {songCount} songs · {albumCount} albums
       </Text>
 
-      <GlassButton style={styles.playAllButton} onPress={onPlayAll}>
-        <Ionicons name="play" size={20} color="#FF6B6B" />
+      <Button style={styles.playAllButton} onPress={onPlayAll}>
+        <Ionicons name="play" size={20} color="#00f2ff" />
         <Text style={styles.playAllText}>Play</Text>
-      </GlassButton>
+      </Button>
     </View>
   );
 };
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     width: 180,
     height: 180,
     borderRadius: 90,
-    backgroundColor: "rgba(255, 107, 107, 0.25)",
+    backgroundColor: "rgba(0, 54, 138, 0.25)",
     justifyContent: "center",
     alignItems: "center",
   },

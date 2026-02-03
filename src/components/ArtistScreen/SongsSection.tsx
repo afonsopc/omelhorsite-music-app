@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
 import { Song } from "../../services/MusicService";
-import { GlassCard } from "../ui/GlassContainer";
+import { Card } from "../ui/Card";
 
 const formatDuration = (seconds: number): string => {
   const mins = Math.floor(seconds / 60);
@@ -20,11 +20,11 @@ export const SongsSection = ({
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Songs</Text>
-        <GlassCard style={styles.emptyStateCard}>
+        <Card style={styles.emptyStateCard}>
           <Text style={styles.emptyStateText}>
             No songs found for this artist.
           </Text>
-        </GlassCard>
+        </Card>
       </View>
     );
   }
@@ -40,7 +40,7 @@ export const SongsSection = ({
             style={styles.songItem}
             onPress={() => onSongPress(song)}
           >
-            <GlassCard style={styles.songCard}>
+            <Card style={styles.songCard}>
               <View style={styles.songContent}>
                 {artworkUrl ? (
                   <Image
@@ -69,7 +69,7 @@ export const SongsSection = ({
                   {formatDuration(song.duration)}
                 </Text>
               </View>
-            </GlassCard>
+            </Card>
           </TouchableOpacity>
         );
       })}
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     height: 52,
     borderRadius: 8,
     marginRight: 12,
-    backgroundColor: "rgba(255, 107, 107, 0.2)",
+    backgroundColor: "rgba(0, 54, 138, 0.2)",
     justifyContent: "center",
     alignItems: "center",
   },

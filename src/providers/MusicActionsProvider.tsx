@@ -13,6 +13,7 @@ type MusicActionsContextType = {
   toggleRepeat: () => Promise<void>;
   toggleShuffle: () => Promise<void>;
   setPlaybackSpeed: (speed: PlaybackSpeed) => Promise<void>;
+  setVolume: (volume: number) => Promise<void>;
 };
 
 export const MusicActionsContext = createContext<MusicActionsContextType | undefined>(undefined);

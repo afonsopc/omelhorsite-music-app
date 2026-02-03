@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { GlassCard } from "../components/ui/GlassContainer";
+import { Card } from "../components/ui/Card";
 import { Song } from "../services/MusicService";
 import { useMusicActions } from "../providers/MusicProvider";
 import {
