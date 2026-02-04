@@ -9,13 +9,12 @@ import {
 } from "../../providers/MusicProvider";
 import { Song } from "../../services/MusicService";
 import { PlaybackSpeed } from "../../types/player";
-import { PlayerHeader } from "./PlayerHeader";
 import { PlayerArtwork } from "./PlayerArtwork";
 import { PlayerSongInfo } from "./PlayerSongInfo";
 import { PlayerProgress } from "./PlayerProgress";
 import { PlayerControls } from "./PlayerControls";
 import { SpeedModal } from "./SpeedModal";
-import { DismissibleContainer } from "./DismissibleContainer";
+import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 
 export const FullPlayer = ({ onClose }: { onClose?: () => void }) => {
   const {
@@ -60,37 +59,36 @@ export const FullPlayer = ({ onClose }: { onClose?: () => void }) => {
   const artworkUrl = Song.artworkUrl(currentSong);
 
   return (
-    <LinearGradient colors={["#000000", "#1a1a1a"]} style={styles.container}>
-      <DismissibleContainer onDismiss={handleClose}>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <PlayerHeader onBack={handleClose} />
+    <LinearGradient colors={["#1a1a1a", "#000000"]} style={styles.container}>
+      <View style={styles.handleContainer}>
+        <View style={styles.handle} />
+      </View>
+      <BottomSheetScrollView showsVerticalScrollIndicator={false}>
+        <PlayerArtwork artworkUrl={artworkUrl} title={currentSong.title} />
 
-          <PlayerArtwork artworkUrl={artworkUrl} title={currentSong.title} />
+        <PlayerSongInfo
+          title={currentSong.title}
+          artist={currentSong.artist || "Unknown Artist"}
+          album={currentSong.album || "Unknown Album"}
+        />
 
-          <PlayerSongInfo
-            title={currentSong.title}
-            artist={currentSong.artist || "Unknown Artist"}
-            album={currentSong.album || "Unknown Album"}
-          />
+        <PlayerProgress onSeek={seek} />
 
-          <PlayerProgress onSeek={seek} />
-
-          <PlayerControls
-            isPlaying={isPlaying}
-            onPlayPause={togglePlay}
-            onNext={next}
-            onPrevious={previous}
-            hasNext={hasNext}
-            hasPrevious={hasPrevious}
-            repeatMode={repeatMode}
-            isShuffled={isShuffled}
-            playbackSpeed={playbackSpeed}
-            onToggleRepeat={toggleRepeat}
-            onToggleShuffle={toggleShuffle}
-            onSpeedPress={handleSpeedPress}
-          />
-        </ScrollView>
-      </DismissibleContainer>
+        <PlayerControls
+          isPlaying={isPlaying}
+          onPlayPause={togglePlay}
+          onNext={next}
+          onPrevious={previous}
+          hasNext={hasNext}
+          hasPrevious={hasPrevious}
+          repeatMode={repeatMode}
+          isShuffled={isShuffled}
+          playbackSpeed={playbackSpeed}
+          onToggleRepeat={toggleRepeat}
+          onToggleShuffle={toggleShuffle}
+          onSpeedPress={handleSpeedPress}
+        />
+      </BottomSheetScrollView>
 
       <SpeedModal
         visible={showSpeedModal}
@@ -112,5 +110,16 @@ const styles = StyleSheet.create({
     color: "rgba(255, 255, 255, 0.6)",
     textAlign: "center",
     marginTop: 100,
+  },
+  handleContainer: {
+    alignItems: "center",
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+  handle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
   },
 });

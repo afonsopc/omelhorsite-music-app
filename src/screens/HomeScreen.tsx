@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingTop: Platform.OS === "ios" ? 60 : 40,
-    paddingBottom: 20,
+    paddingBottom: 50,
   },
   header: {
     paddingHorizontal: 24,
