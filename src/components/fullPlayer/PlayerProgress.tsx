@@ -12,8 +12,22 @@ export const PlayerProgress = ({
   const [isSeeking, setIsSeeking] = useState(false);
   const [seekPosition, setSeekPosition] = useState(0);
   const seekTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastSeekTargetRef = useRef<number | null>(null);
 
-  const displayPosition = isSeeking ? seekPosition : position;
+  const displayPosition = isSeeking
+    ? seekPosition
+    : lastSeekTargetRef.current !== null
+      ? lastSeekTargetRef.current
+      : position;
+
+  useEffect(() => {
+    if (!isSeeking && lastSeekTargetRef.current !== null) {
+      const diff = Math.abs(position - lastSeekTargetRef.current);
+      if (diff < 1) {
+        lastSeekTargetRef.current = null;
+      }
+    }
+  }, [position, isSeeking]);
 
   useEffect(() => {
     return () => {
@@ -43,15 +57,18 @@ export const PlayerProgress = ({
       clearTimeout(seekTimeoutRef.current);
     }
 
+    lastSeekTargetRef.current = value;
+
     try {
       await onSeek(value);
     } catch (error) {
       console.error("Seek error:", error);
+      lastSeekTargetRef.current = null;
     }
 
     seekTimeoutRef.current = setTimeout(() => {
       setIsSeeking(false);
-    }, 100);
+    }, 1000);
   };
 
   return (

@@ -221,41 +221,50 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
 
   const toggleShuffle = async () => {
     try {
+      if (!currentSong) return;
+
+      const wasPlaying = playbackState.state === State.Playing || playbackState.state === State.Buffering;
+      const currentPosition = await TrackPlayer.getProgress();
+
       if (!isShuffled) {
-        const currentSongId = currentSong?.id;
+        const currentSongId = currentSong.id;
         const otherSongs = queue.filter((s) => s.id !== currentSongId);
-
         const shuffled = [...otherSongs].sort(() => Math.random() - 0.5);
-
-        const newQueue = currentSong ? [currentSong, ...shuffled] : shuffled;
+        const newQueue = [currentSong, ...shuffled];
 
         setOriginalQueue(queue);
         setQueue(newQueue);
         setIsShuffled(true);
 
         await resetAndAddTracks(newQueue);
-        
         currentQueueIdsRef.current = newQueue.map((s) => s.id).join(",");
         
-        await TrackPlayer.play();
+        await TrackPlayer.skip(0);
+        await TrackPlayer.seekTo(currentPosition.position);
+        
+        if (wasPlaying) {
+          await TrackPlayer.play();
+        }
       } else {
-        const currentSongId = currentSong?.id;
+        const currentSongId = currentSong.id;
         const currentIndexInOriginal = originalQueue.findIndex(
           (s) => s.id === currentSongId,
         );
+
+        if (currentIndexInOriginal < 0) return;
 
         setQueue(originalQueue);
         setIsShuffled(false);
 
         await resetAndAddTracks(originalQueue);
-        
         currentQueueIdsRef.current = originalQueue.map((s) => s.id).join(",");
 
-        if (currentIndexInOriginal >= 0) {
-          await TrackPlayer.skip(currentIndexInOriginal);
-        }
+        await TrackPlayer.skip(currentIndexInOriginal);
+        await TrackPlayer.seekTo(currentPosition.position);
 
-        await TrackPlayer.play();
+        if (wasPlaying) {
+          await TrackPlayer.play();
+        }
       }
     } catch (error) {
       console.error("Failed to toggle shuffle:", error);

@@ -34,7 +34,6 @@ export const PlayerControls = ({
   const getRepeatIcon = () => {
     switch (repeatMode) {
       case RepeatMode.One:
-        return "repeat-one";
       case RepeatMode.All:
         return "repeat";
       case RepeatMode.Off:
@@ -55,11 +54,13 @@ export const PlayerControls = ({
           ]}
           onPress={onToggleShuffle}
         >
-          <Ionicons
-            name={isShuffled ? "shuffle" : "shuffle-outline"}
-            size={24}
-            color={isShuffled ? "#00f2ff" : "#FFFFFF"}
-          />
+          <View style={styles.shuffleIconContainer}>
+            <Ionicons
+              name={isShuffled ? "shuffle" : "shuffle-outline"}
+              size={24}
+              color={isShuffled ? "#00f2ff" : "#FFFFFF"}
+            />
+          </View>
         </Pressable>
 
         <Pressable
@@ -113,11 +114,18 @@ export const PlayerControls = ({
           ]}
           onPress={onToggleRepeat}
         >
-          <Ionicons
-            name={getRepeatIcon() as any}
-            size={24}
-            color={isRepeatActive ? "#00f2ff" : "#FFFFFF"}
-          />
+          <View style={styles.repeatIconContainer}>
+            <Ionicons
+              name={getRepeatIcon() as any}
+              size={24}
+              color={isRepeatActive ? "#00f2ff" : "#FFFFFF"}
+            />
+            {repeatMode === RepeatMode.One && (
+              <View style={styles.repeatOneBadge}>
+                <Text style={styles.repeatOneText}>1</Text>
+              </View>
+            )}
+          </View>
         </Pressable>
       </View>
 
@@ -188,5 +196,31 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 14,
     fontWeight: "600",
+  },
+  shuffleIconContainer: {
+    position: "relative",
+    width: 24,
+    height: 24,
+  },
+  repeatIconContainer: {
+    position: "relative",
+    width: 24,
+    height: 24,
+  },
+  repeatOneBadge: {
+    position: "absolute",
+    top: 0,
+    right: -4,
+    backgroundColor: "#00f2ff",
+    borderRadius: 6,
+    width: 8,
+    height: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  repeatOneText: {
+    color: "#000",
+    fontSize: 7,
+    fontWeight: "bold",
   },
 });

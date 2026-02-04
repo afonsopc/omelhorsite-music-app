@@ -53,6 +53,7 @@ export const MusicPlayerBar = ({
   const [hoveredArtist, setHoveredArtist] = useState(false);
   const [showSpeedModal, setShowSpeedModal] = useState(false);
   const [localSpeed, setLocalSpeed] = useState<number>(playbackSpeed);
+  const [displayPosition, setDisplayPosition] = useState(position);
 
   if (!currentSong) {
     return null;
@@ -90,7 +91,7 @@ export const MusicPlayerBar = ({
   const getRepeatIcon = () => {
     switch (repeatMode) {
       case RepeatMode.One:
-        return "repeat-one";
+        return "repeat";
       case RepeatMode.All:
         return "repeat";
       case RepeatMode.Off:
@@ -229,26 +230,35 @@ export const MusicPlayerBar = ({
                 style={({ pressed }) => [
                   styles.desktopSecondaryButton,
                   pressed && styles.pressed,
+                  styles.repeatButton,
                 ]}
                 onPress={toggleRepeat}
               >
                 <Ionicons
-                  name={getRepeatIcon() as any}
+                  name={RepeatMode.Off ? "repeat-outline" : "repeat"}
                   size={20}
                   color={
                     isRepeatActive ? "#00f2ff" : "rgba(255, 255, 255, 0.7)"
                   }
                 />
+                {repeatMode === RepeatMode.One && (
+                  <View style={styles.repeatOneBadge}>
+                    <Text style={styles.repeatOneText}>1</Text>
+                  </View>
+                )}
               </Pressable>
             </View>
 
             <View style={styles.desktopProgressRow}>
-              <Text style={styles.desktopTimeText}>{formatTime(position)}</Text>
+              <Text style={styles.desktopTimeText}>
+                {formatTime(displayPosition)}
+              </Text>
               <View style={styles.progressSliderWrapper}>
                 <CompactProgressSlider
                   position={position}
                   duration={duration}
                   onSeek={seek}
+                  onDisplayPositionChange={setDisplayPosition}
                 />
               </View>
               <Text style={styles.desktopTimeText}>{formatTime(duration)}</Text>
@@ -285,9 +295,11 @@ export const MusicPlayerBar = ({
               onPress={(e) => e.stopPropagation()}
             >
               <Text style={styles.speedModalTitle}>Playback Speed</Text>
-              
-              <Text style={styles.speedValueText}>{localSpeed.toFixed(2)}x</Text>
-              
+
+              <Text style={styles.speedValueText}>
+                {localSpeed.toFixed(2)}x
+              </Text>
+
               <Slider
                 style={styles.speedSlider}
                 minimumValue={0.5}
@@ -300,21 +312,23 @@ export const MusicPlayerBar = ({
                 maximumTrackTintColor="rgba(255, 255, 255, 0.3)"
                 thumbTintColor="#00f2ff"
               />
-              
+
               <View style={styles.speedButtonsRow}>
                 {PLAYBACK_SPEEDS.map((speed) => (
                   <Pressable
                     key={speed}
                     style={[
                       styles.speedButton,
-                      Math.abs(speed - localSpeed) < 0.01 && styles.speedButtonActive,
+                      Math.abs(speed - localSpeed) < 0.01 &&
+                        styles.speedButtonActive,
                     ]}
                     onPress={() => handleSpeedSelect(speed)}
                   >
                     <Text
                       style={[
                         styles.speedButtonText,
-                        Math.abs(speed - localSpeed) < 0.01 && styles.speedButtonTextActive,
+                        Math.abs(speed - localSpeed) < 0.01 &&
+                          styles.speedButtonTextActive,
                       ]}
                     >
                       {speed}x
@@ -531,6 +545,25 @@ const styles = StyleSheet.create({
   progressSliderWrapper: {
     flex: 1,
     marginHorizontal: 12,
+  },
+  repeatButton: {
+    position: "relative",
+  },
+  repeatOneBadge: {
+    position: "absolute",
+    top: 8,
+    right: 4,
+    backgroundColor: "#00f2ff",
+    borderRadius: 6,
+    width: 8,
+    height: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  repeatOneText: {
+    color: "#000",
+    fontSize: 8,
+    fontWeight: "bold",
   },
   desktopControlButton: {
     padding: 8,
