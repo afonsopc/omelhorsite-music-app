@@ -336,71 +336,47 @@ export const MusicPlayerBar = ({
       activeOpacity={0.8}
     >
       <View style={styles.mobileContent}>
-        <View style={styles.mobileTopRow}>
-          <View style={styles.mobileArtworkContainer}>
-            {artworkUrl ? (
-              <Image
-                source={{ uri: artworkUrl }}
-                style={styles.mobileArtwork}
-                contentFit="cover"
-                cachePolicy="disk"
-                transition={200}
-              />
-            ) : (
-              <View style={styles.artworkPlaceholder}>
-                <Text style={styles.artworkText}>
-                  {currentSong.title.charAt(0).toUpperCase()}
-                </Text>
-              </View>
-            )}
-          </View>
-
-          <View style={styles.mobileInfoContainer}>
-            <Pressable
-              onPress={(e) => {
-                e.stopPropagation();
-                handleAlbumPress();
-              }}
-            >
-              <Text style={styles.mobileTitle} numberOfLines={1}>
-                {currentSong.title}
-              </Text>
-            </Pressable>
-            <Pressable
-              onPress={(e) => {
-                e.stopPropagation();
-                handleArtistPress();
-              }}
-            >
-              <Text style={styles.mobileArtist} numberOfLines={1}>
-                {currentSong.artist || "Unknown Artist"}
-              </Text>
-            </Pressable>
-          </View>
-
-          <TouchableOpacity
-            style={styles.mobilePlayButton}
-            onPress={(e) => {
-              e.stopPropagation();
-              togglePlay();
-            }}
-            activeOpacity={0.7}
-          >
-            <Ionicons
-              name={isPlaying ? "pause" : "play"}
-              size={24}
-              color="#00f2ff"
+        <View style={styles.mobileArtworkContainer}>
+          {artworkUrl ? (
+            <Image
+              source={{ uri: artworkUrl }}
+              style={styles.mobileArtwork}
+              contentFit="cover"
+              cachePolicy="disk"
+              transition={200}
             />
-          </TouchableOpacity>
+          ) : (
+            <View style={styles.artworkPlaceholder}>
+              <Text style={styles.artworkText}>
+                {currentSong.title.charAt(0).toUpperCase()}
+              </Text>
+            </View>
+          )}
         </View>
 
-        <View style={styles.mobileProgressRow}>
-          <CompactProgressSlider
-            position={position}
-            duration={duration}
-            onSeek={seek}
-          />
+        <View style={styles.mobileInfoContainer}>
+          <Text style={styles.mobileTitle} numberOfLines={1}>
+            {currentSong.title}
+          </Text>
+          <Text style={styles.mobileArtist} numberOfLines={1}>
+            {currentSong.artist || "Unknown Artist"}
+          </Text>
         </View>
+
+        <TouchableOpacity
+          style={styles.mobilePlayButton}
+          onPress={(e) => {
+            e.stopPropagation();
+            togglePlay();
+          }}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name={isPlaying ? "pause" : "play"}
+            size={24}
+            color="#00f2ff"
+          />
+        </TouchableOpacity>
       </View>
     </TouchableOpacity>
   );
@@ -409,7 +385,7 @@ export const MusicPlayerBar = ({
 const styles = StyleSheet.create({
   mobileContainer: {
     width: "100%",
-    height: 102,
+    height: 72,
     borderRadius: 16,
     overflow: "hidden",
     elevation: 10,
@@ -422,14 +398,10 @@ const styles = StyleSheet.create({
     borderColor: "rgba(255, 255, 255, 0.1)",
   },
   mobileContent: {
-    flexDirection: "column",
-    padding: 12,
-    height: "100%",
-  },
-  mobileTopRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 8,
+    padding: 12,
+    height: "100%",
   },
   mobileArtworkContainer: {
     width: 48,
@@ -477,9 +449,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.2)",
-  },
-  mobileProgressRow: {
-    width: "100%",
   },
   desktopContainer: {
     width: "100%",
