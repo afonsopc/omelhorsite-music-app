@@ -1,5 +1,5 @@
 import { Track, PitchAlgorithm } from "react-native-track-player";
-import { backend, ListFilters } from "./BackendService";
+import { backend, FALLBACK_IMAGE_URL, ListFilters } from "./BackendService";
 import { FsNode } from "./FsNodeService";
 
 export type Song = {
