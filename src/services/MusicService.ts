@@ -1,10 +1,5 @@
-import { Track } from "react-native-track-player";
-import {
-  backend,
-  FALLBACK_IMAGE_URL,
-  getAuthenticatedBackendUrl,
-  ListFilters,
-} from "./BackendService";
+import { Track, PitchAlgorithm } from "react-native-track-player";
+import { backend, ListFilters } from "./BackendService";
 import { FsNode } from "./FsNodeService";
 
 export type Song = {
@@ -13,8 +8,6 @@ export type Song = {
   album: string | null;
   artist: string | null;
   duration: number;
-  track_number: number | null;
-  disc_number: number | null;
   year: number | null;
   position: number;
   audio_fs_node_id: string;
@@ -112,6 +105,7 @@ export const Song = {
     album: song.album || "Unknown Album",
     duration: song.duration,
     isLiveStream: false,
+    pitchAlgorithm: PitchAlgorithm.Linear,
   }),
   is: (variable: any): variable is Song => {
     return (

@@ -38,7 +38,7 @@ export const TracksSection = ({
             <View style={styles.songContent}>
               <View style={styles.trackNumber}>
                 <Text style={styles.trackNumberText}>
-                  {song.track_number || "-"}
+                  {song.position || "-"}
                 </Text>
               </View>
               <View style={styles.songInfo}>

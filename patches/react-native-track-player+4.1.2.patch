@@ -1,0 +1,12 @@
+diff --git a/node_modules/react-native-track-player/lib/web/TrackPlayer/Player.js b/node_modules/react-native-track-player/lib/web/TrackPlayer/Player.js
+index 5953276..29ad204 100644
+--- a/node_modules/react-native-track-player/lib/web/TrackPlayer/Player.js
++++ b/node_modules/react-native-track-player/lib/web/TrackPlayer/Player.js
+@@ -55,6 +55,7 @@ export class Player {
+         // build dom element and attach shaka-player
+         this.element = document.createElement('audio');
+         this.element.setAttribute('id', 'react-native-track-player');
++        this.element.preservesPitch = false;
+         this.player = new shaka.Player();
+         this.player?.attach(this.element);
+         // Listen for relevant events events.

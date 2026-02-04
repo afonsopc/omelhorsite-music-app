@@ -1,9 +1,8 @@
-import React from "react";
 import { View, Pressable, StyleSheet, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { RepeatMode } from "../../types/player";
 
-interface PlayerControlsProps {
+type PlayerControlsProps = {
   isPlaying: boolean;
   hasNext: boolean;
   hasPrevious: boolean;
@@ -16,9 +15,9 @@ interface PlayerControlsProps {
   onToggleRepeat: () => void;
   onToggleShuffle: () => void;
   onSpeedPress: () => void;
-}
+};
 
-export const PlayerControls: React.FC<PlayerControlsProps> = ({
+export const PlayerControls = ({
   isPlaying,
   hasNext,
   hasPrevious,
@@ -31,7 +30,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
   onToggleRepeat,
   onToggleShuffle,
   onSpeedPress,
-}) => {
+}: PlayerControlsProps) => {
   const getRepeatIcon = () => {
     switch (repeatMode) {
       case RepeatMode.One:
@@ -48,7 +47,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
 
   return (
     <View style={styles.container}>
-      <View style={styles.secondaryControls}>
+      <View style={styles.controlsRow}>
         <Pressable
           style={({ pressed }) => [
             styles.secondaryButton,
@@ -63,22 +62,6 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
           />
         </Pressable>
 
-        <Pressable
-          style={({ pressed }) => [
-            styles.secondaryButton,
-            pressed && styles.pressed,
-          ]}
-          onPress={onToggleRepeat}
-        >
-          <Ionicons
-            name={getRepeatIcon() as any}
-            size={24}
-            color={isRepeatActive ? "#00f2ff" : "#FFFFFF"}
-          />
-        </Pressable>
-      </View>
-
-      <View style={styles.mainControls}>
         <Pressable
           style={({ pressed }) => [
             styles.controlButton,
@@ -122,6 +105,20 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
             color={hasNext ? "#FFFFFF" : "rgba(255, 255, 255, 0.3)"}
           />
         </Pressable>
+
+        <Pressable
+          style={({ pressed }) => [
+            styles.secondaryButton,
+            pressed && styles.pressed,
+          ]}
+          onPress={onToggleRepeat}
+        >
+          <Ionicons
+            name={getRepeatIcon() as any}
+            size={24}
+            color={isRepeatActive ? "#00f2ff" : "#FFFFFF"}
+          />
+        </Pressable>
       </View>
 
       <View style={styles.speedControl}>
@@ -144,25 +141,18 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     alignItems: "center",
   },
-  secondaryControls: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    paddingHorizontal: 60,
-    marginBottom: 20,
-  },
-  secondaryButton: {
-    padding: 10,
-  },
-  mainControls: {
+  controlsRow: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
+    gap: 4,
+  },
+  secondaryButton: {
+    padding: 12,
   },
   controlButton: {
-    padding: 20,
-    marginHorizontal: 20,
+    padding: 12,
   },
   pressed: {
     opacity: 0.5,
@@ -176,6 +166,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 2,
     borderColor: "#00f2ff",
+    marginHorizontal: 8,
   },
   playButtonPressed: {
     transform: [{ scale: 0.95 }],

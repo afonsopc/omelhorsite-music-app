@@ -170,10 +170,7 @@ export const ProfileScreen: React.FC = () => {
         </View>
 
         <View style={styles.logoutSection}>
-          <Button
-            style={styles.logoutButton}
-            onPress={handleLogout}
-          >
+          <Button style={styles.logoutButton} onPress={handleLogout}>
             <Text style={styles.logoutButtonText}>Sign Out</Text>
           </Button>
         </View>

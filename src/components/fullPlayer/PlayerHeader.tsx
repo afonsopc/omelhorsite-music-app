@@ -1,15 +1,15 @@
-import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
-interface PlayerHeaderProps {
+type PlayerHeaderProps = {
   onBack: () => void;
-}
+};
 
-export const PlayerHeader: React.FC<PlayerHeaderProps> = ({ onBack }) => {
+export const PlayerHeader = ({ onBack }: PlayerHeaderProps) => {
   return (
     <View style={styles.header}>
       <TouchableOpacity onPress={onBack} style={styles.backButtonContainer}>
-        <Text style={styles.backButton}>⌄</Text>
+        <Ionicons name="chevron-down" size={24} color="#FFFFFF" />
       </TouchableOpacity>
       <Text style={styles.headerTitle}>Now Playing</Text>
       <View style={{ width: 40 }} />
@@ -33,11 +33,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.1)",
     justifyContent: "center",
     alignItems: "center",
-  },
-  backButton: {
-    fontSize: 32,
-    color: "#FFFFFF",
-    fontWeight: "bold",
   },
   headerTitle: {
     fontSize: 18,
