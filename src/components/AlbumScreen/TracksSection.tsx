@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Song } from "../../services/MusicService";
 import { Card } from "../ui/Card";
+import { usePlaylist } from "../../providers/AddToPlaylistProvider";
 
 const formatDuration = (seconds: number): string => {
   const mins = Math.floor(seconds / 60);
@@ -15,6 +16,8 @@ export const TracksSection = ({
   songs: Song[];
   onSongPress: (song: Song) => void;
 }) => {
+  const { openAddToPlaylist } = usePlaylist();
+
   if (songs.length === 0) {
     return (
       <Card style={styles.emptyStateCard}>
@@ -33,6 +36,7 @@ export const TracksSection = ({
           key={`song-${song.id}`}
           style={styles.songItem}
           onPress={() => onSongPress(song)}
+          onLongPress={() => openAddToPlaylist(song)}
         >
           <Card style={styles.songCard}>
             <View style={styles.songContent}>

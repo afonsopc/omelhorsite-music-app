@@ -10,6 +10,7 @@ import { useMusicState } from "../src/providers/MusicProvider";
 import { FullPlayer } from "../src/components/fullPlayer";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { TabBarProvider, useTabBar } from "../src/providers/TabBarProvider";
+import { AddToPlaylistProvider } from "../src/providers/AddToPlaylistProvider";
 import { initializeImageCache } from "../src/config/imageCache";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
@@ -84,11 +85,13 @@ export default function RootLayout() {
       <QueryProvider>
         <AuthProvider>
           <MusicProvider>
-            <TabBarProvider>
-              <StatusBar style="light" />
-              <Slot />
-              <MusicPlayerModal />
-            </TabBarProvider>
+            <AddToPlaylistProvider>
+              <TabBarProvider>
+                <StatusBar style="light" />
+                <Slot />
+                <MusicPlayerModal />
+              </TabBarProvider>
+            </AddToPlaylistProvider>
           </MusicProvider>
         </AuthProvider>
       </QueryProvider>

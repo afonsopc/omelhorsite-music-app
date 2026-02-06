@@ -10,12 +10,14 @@ type SearchResultItemProps = {
   item: Song | string | Album | Playlist;
   type: "song" | "artist" | "album" | "playlist";
   onPress?: () => void;
+  onLongPress?: () => void;
 };
 
 export const SearchResultItem = ({
   item,
   type,
   onPress,
+  onLongPress,
 }: SearchResultItemProps) => {
   let name: string;
   let subtitle: string = "";
@@ -49,7 +51,7 @@ export const SearchResultItem = ({
   }
 
   return (
-    <TouchableOpacity style={styles.resultItem} onPress={onPress}>
+    <TouchableOpacity style={styles.resultItem} onPress={onPress} onLongPress={onLongPress}>
       <Card style={styles.resultCard}>
         <View style={styles.resultContent}>
           {type === "artist" ? (

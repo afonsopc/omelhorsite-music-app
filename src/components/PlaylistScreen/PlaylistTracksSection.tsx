@@ -1,31 +1,32 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
-import { Song } from "../../services/MusicService";
+import { Song, PlaylistSong } from "../../services/MusicService";
 import { Card } from "../ui/Card";
-import { usePlaylist } from "../../providers/AddToPlaylistProvider";
 
-const formatDuration = (seconds: number): string => {
+const formatDuration = (seconds: number) => {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 };
 
-export const SongsSection = ({
-  songs,
+export const PlaylistTracksSection = ({
+  playlistSongs,
   onSongPress,
+  onSongLongPress,
 }: {
-  songs: Song[];
-  onSongPress: (song: Song) => void;
+  playlistSongs: PlaylistSong[];
+  onSongPress: (song: Song, allSongs: Song[]) => void;
+  onSongLongPress: (song: Song, playlistSongId: number) => void;
 }) => {
-  const { openAddToPlaylist } = usePlaylist();
+  const allSongs = playlistSongs.map((ps) => ps.song);
 
-  if (songs.length === 0) {
+  if (playlistSongs.length === 0) {
     return (
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Songs</Text>
+        <Text style={styles.sectionTitle}>Tracks</Text>
         <Card style={styles.emptyStateCard}>
           <Text style={styles.emptyStateText}>
-            No songs found for this artist.
+            This playlist is empty. Long press on any song to add it here.
           </Text>
         </Card>
       </View>
@@ -34,15 +35,16 @@ export const SongsSection = ({
 
   return (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>Songs</Text>
-      {songs.map((song) => {
+      <Text style={styles.sectionTitle}>Tracks</Text>
+      {playlistSongs.map((playlistSong) => {
+        const { song } = playlistSong;
         const artworkUrl = Song.artworkUrl(song);
         return (
           <TouchableOpacity
-            key={`song-${song.id}`}
+            key={`ps-${playlistSong.id}`}
             style={styles.songItem}
-            onPress={() => onSongPress(song)}
-            onLongPress={() => openAddToPlaylist(song)}
+            onPress={() => onSongPress(song, allSongs)}
+            onLongPress={() => onSongLongPress(song, playlistSong.id)}
           >
             <Card style={styles.songCard}>
               <View style={styles.songContent}>
@@ -66,7 +68,7 @@ export const SongsSection = ({
                     {song.title}
                   </Text>
                   <Text style={styles.songSubtitle} numberOfLines={1}>
-                    {song.album || "Unknown Album"}
+                    {song.artist || "Unknown Artist"}
                   </Text>
                 </View>
                 <Text style={styles.songDuration}>

@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet } from "react-native";
 import { Song } from "../../services/MusicService";
 import { SearchResultItem } from "./SearchResultItem";
+import { usePlaylist } from "../../providers/AddToPlaylistProvider";
 
 type SongsResultsSectionProps = {
   songs: Song[];
@@ -11,6 +12,8 @@ export const SongsResultsSection = ({
   songs,
   onSongPress,
 }: SongsResultsSectionProps) => {
+  const { openAddToPlaylist } = usePlaylist();
+
   if (songs.length === 0) return null;
 
   return (
@@ -22,6 +25,7 @@ export const SongsResultsSection = ({
           item={song}
           type="song"
           onPress={() => onSongPress(song, songs)}
+          onLongPress={() => openAddToPlaylist(song)}
         />
       ))}
     </View>

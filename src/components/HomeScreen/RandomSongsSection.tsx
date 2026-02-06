@@ -11,9 +11,11 @@ import { Song } from "../../services/MusicService";
 import { Card } from "../ui/Card";
 import { useListSongsQuery } from "../../lib/queries/music";
 import { SongCardSkeleton } from "../Skeletons/SongCardSkeleton";
+import { usePlaylist } from "../../providers/AddToPlaylistProvider";
 
 export const RandomSongsSection: React.FC = () => {
   const { loadAndPlay } = useMusicActions();
+  const { openAddToPlaylist } = usePlaylist();
   const randomSongsQuery = useListSongsQuery({
     modifiers: {
       random: true,
@@ -67,6 +69,7 @@ export const RandomSongsSection: React.FC = () => {
               key={song.id}
               style={styles.songItem}
               onPress={() => loadAndPlay(song, randomSongsQuery.data)}
+              onLongPress={() => openAddToPlaylist(song)}
             >
               <Card style={styles.songCard}>
                 {artworkUrl ? (

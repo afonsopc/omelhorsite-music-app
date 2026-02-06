@@ -98,7 +98,10 @@ export const SearchScreen = () => {
               albums={searchResults.albums}
               searchQuery={searchQuery}
             />
-            <PlaylistsResultsSection playlists={searchResults.playlists} />
+            <PlaylistsResultsSection
+              playlists={searchResults.playlists}
+              searchQuery={searchQuery}
+            />
 
             {hasNoResults && <NoResultsState />}
           </>

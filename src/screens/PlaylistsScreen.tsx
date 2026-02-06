@@ -1,21 +1,39 @@
-import React from "react";
 import {
   View,
   Text,
   ScrollView,
   StyleSheet,
-  TouchableOpacity,
   Platform,
-  Image,
-  ActivityIndicator,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { Card, Button } from "../components/ui/Card";
+import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { usePlaylistsQuery } from "../lib/queries/music";
+import { usePlaylist } from "../providers/AddToPlaylistProvider";
 import { Playlist } from "../services/MusicService";
+import { Card, Button } from "../components/ui/Card";
+import { PlaylistListItem } from "../components/PlaylistsScreen/PlaylistListItem";
+import { PlaylistItemSkeleton } from "../components/Skeletons/PlaylistItemSkeleton";
 
-export const PlaylistsScreen: React.FC = () => {
+export const PlaylistsScreen = () => {
+  const router = useRouter();
+  const playlistsQuery = usePlaylistsQuery();
+  const { openCreatePlaylist } = usePlaylist();
+
+  const playlists = playlistsQuery.data ?? [];
+
+  const handlePlaylistPress = (playlist: Playlist) => {
+    router.push({
+      pathname: "/playlist/[id]",
+      params: { id: playlist.id.toString(), name: playlist.name },
+    });
+  };
+
+  const handleCreatePlaylist = () => {
+    openCreatePlaylist();
+  };
+
   return (
-    <LinearGradient colors={["#000000", "#1a1a1a"]} style={styles.container}>
+    <View style={styles.container}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
@@ -23,17 +41,58 @@ export const PlaylistsScreen: React.FC = () => {
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Playlists</Text>
           <Text style={styles.headerSubtitle}>Your music collections</Text>
-          <Text style={styles.headerSubtitle}>NOT IMPLEMENTED</Text>
         </View>
+
+        <View style={styles.createSection}>
+          <Button style={styles.createPlaylistButton} onPress={handleCreatePlaylist}>
+            <Ionicons name="add-circle-outline" size={22} color="#00f2ff" />
+            <Text style={styles.createPlaylistButtonText}>Create Playlist</Text>
+          </Button>
+        </View>
+
+        {playlistsQuery.isLoading ? (
+          <View>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <PlaylistItemSkeleton key={i} />
+            ))}
+          </View>
+        ) : playlists.length === 0 ? (
+          <Card style={styles.emptyStateCard}>
+            <Ionicons
+              name="musical-notes-outline"
+              size={48}
+              color="rgba(255, 255, 255, 0.4)"
+            />
+            <Text style={styles.emptyStateTitle}>No playlists yet</Text>
+            <Text style={styles.emptyStateText}>
+              Create a playlist to organize your favorite music
+            </Text>
+            <Button style={styles.createButton} onPress={handleCreatePlaylist}>
+              <Text style={styles.createButtonText}>Create Your First Playlist</Text>
+            </Button>
+          </Card>
+        ) : (
+          <View style={styles.playlistsSection}>
+            {playlists.map((playlist) => (
+              <PlaylistListItem
+                key={playlist.id}
+                playlist={playlist}
+                onPress={handlePlaylistPress}
+              />
+            ))}
+          </View>
+        )}
+
         <View style={{ height: 100 }} />
       </ScrollView>
-    </LinearGradient>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#000000",
   },
   scrollContent: {
     paddingTop: Platform.OS === "ios" ? 60 : 40,
@@ -41,7 +100,7 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 24,
-    marginBottom: 32,
+    marginBottom: 24,
   },
   headerTitle: {
     fontSize: 32,
@@ -58,68 +117,22 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   createPlaylistButton: {
-    paddingVertical: 16,
+    paddingVertical: 14,
     paddingHorizontal: 24,
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
   },
   createPlaylistButtonText: {
     fontSize: 16,
     fontWeight: "600",
     color: "#FFFFFF",
   },
-  playlistsSection: {
-    paddingHorizontal: 16,
-  },
-  playlistItem: {
-    marginBottom: 12,
-  },
-  playlistCard: {
-    padding: 16,
-  },
-  playlistContent: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  playlistArtwork: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    marginRight: 16,
-  },
-  playlistArtworkPlaceholder: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    marginRight: 16,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  playlistArtworkText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#FFFFFF",
-  },
-  playlistInfo: {
-    flex: 1,
-  },
-  playlistName: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#FFFFFF",
-    marginBottom: 4,
-  },
-  playlistMeta: {
-    fontSize: 14,
-    color: "rgba(255, 255, 255, 0.6)",
-    marginBottom: 2,
-  },
-  playlistDate: {
-    fontSize: 12,
-    color: "rgba(255, 255, 255, 0.4)",
-  },
+  playlistsSection: {},
   emptyStateCard: {
     marginHorizontal: 24,
-    marginTop: 60,
+    marginTop: 40,
     padding: 40,
     alignItems: "center",
   },
@@ -127,6 +140,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "600",
     color: "#FFFFFF",
+    marginTop: 16,
     marginBottom: 8,
   },
   emptyStateText: {
@@ -143,25 +157,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#FFFFFF",
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  loadingText: {
-    fontSize: 18,
-    color: "rgba(255, 255, 255, 0.8)",
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 24,
-  },
-  errorText: {
-    fontSize: 16,
-    color: "rgba(255, 100, 100, 0.8)",
-    textAlign: "center",
   },
 });
