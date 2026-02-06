@@ -86,20 +86,7 @@ export const useListSongsByAlbumQuery = (
     : { exact_search: { album: albumName, artist: null } };
   return query(
     [LIST_SONGS, "byAlbum", albumName, artistName],
-    async () => {
-      const songs = await Song.list(filters);
-      console.log(
-        "useListSongsByAlbumQuery - fetched songs:",
-        {
-          albumName,
-          artistName,
-          filters,
-          songsLength: songs.length,
-        },
-        songs,
-      );
-      return songs;
-    },
+    () => Song.list(filters),
     options,
   );
 };
