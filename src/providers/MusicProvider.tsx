@@ -16,7 +16,10 @@ import {
 } from "../services/TrackPlayerService";
 import { MusicStateContext, useMusicState } from "./MusicStateProvider";
 import { MusicActionsContext, useMusicActions } from "./MusicActionsProvider";
-import { MusicPositionContext, useMusicPosition } from "./MusicPositionProvider";
+import {
+  MusicPositionContext,
+  useMusicPosition,
+} from "./MusicPositionProvider";
 
 export { useMusicState, useMusicActions, useMusicPosition };
 
@@ -36,7 +39,7 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
   const [playbackSpeed, setPlaybackSpeedState] = useState<PlaybackSpeed>(1.0);
   const [volume, setVolumeState] = useState<number>(1.0);
   const [originalQueue, setOriginalQueue] = useState<Song[]>([]);
-  
+
   const currentQueueIdsRef = useRef<string>("");
 
   const isPlaying =
@@ -56,7 +59,11 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
           autoUpdateMetadata: true,
           autoHandleInterruptions: true,
         });
+      } catch {
+        // Player may already be initialized (e.g. after hot reload)
+      }
 
+      try {
         await TrackPlayer.updateOptions({
           android: {
             appKilledPlaybackBehavior:
@@ -223,7 +230,9 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
     try {
       if (!currentSong) return;
 
-      const wasPlaying = playbackState.state === State.Playing || playbackState.state === State.Buffering;
+      const wasPlaying =
+        playbackState.state === State.Playing ||
+        playbackState.state === State.Buffering;
       const currentPosition = await TrackPlayer.getProgress();
 
       if (!isShuffled) {
@@ -238,10 +247,10 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
 
         await resetAndAddTracks(newQueue);
         currentQueueIdsRef.current = newQueue.map((s) => s.id).join(",");
-        
+
         await TrackPlayer.skip(0);
         await TrackPlayer.seekTo(currentPosition.position);
-        
+
         if (wasPlaying) {
           await TrackPlayer.play();
         }
@@ -290,7 +299,10 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
     }
   };
 
-  const hasNext = useMemo(() => currentIndex < queue.length - 1, [currentIndex, queue.length]);
+  const hasNext = useMemo(
+    () => currentIndex < queue.length - 1,
+    [currentIndex, queue.length],
+  );
   const hasPrevious = useMemo(() => currentIndex > 0, [currentIndex]);
 
   const stateValue = useMemo(

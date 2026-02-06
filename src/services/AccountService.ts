@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { backend, setAuthToken } from "./BackendService";
+import { Method } from "../lib/request";
 
 const STORAGE_KEY = "music_app_token";
 
@@ -42,18 +43,20 @@ export type Session = {
 
 export const Session = {
   create: (email: string, password: string) =>
-    backend<Session>("sessions", "POST", {
+    backend<Session>("sessions", Method.POST, {
       email,
       password,
     }).then((response) => response.data),
   destroy: (sessionId: string) =>
-    backend<void>(`sessions/${sessionId}`, "DELETE").then(
+    backend<void>(`sessions/${sessionId}`, Method.DELETE).then(
       (response) => response.data,
     ),
   getCurrent: () =>
-    backend<Session>("sessions/mine", "GET").then((response) => response.data),
+    backend<Session>("sessions/mine", Method.GET).then(
+      (response) => response.data,
+    ),
   login: async (email: string, password: string) => {
-    const session = await backend<Session>("sessions", "POST", {
+    const session = await backend<Session>("sessions", Method.POST, {
       email,
       password,
     }).then((response) => response.data);
@@ -64,11 +67,11 @@ export const Session = {
   logout: async () => {
     const token = await storage.get();
     if (token) {
-      const session = await backend<Session>("sessions/mine", "GET").then(
+      const session = await backend<Session>("sessions/mine", Method.GET).then(
         (response) => response.data,
       );
       if (session) {
-        await backend<void>(`sessions/${session.id}`, "DELETE").then(
+        await backend<void>(`sessions/${session.id}`, Method.DELETE).then(
           (response) => response.data,
         );
       }

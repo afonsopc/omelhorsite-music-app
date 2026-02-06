@@ -49,6 +49,12 @@ export const AlbumScreen = () => {
   const { loadAndPlay } = useMusicActions();
 
   const songsQuery = useListSongsByAlbumQuery(albumName, artistName);
+  console.log("AlbumScreen - songsQuery:", {
+    albumName,
+    artistName,
+    isLoading: songsQuery.isLoading,
+    dataLength: songsQuery.data?.length,
+  });
 
   const orderedSongs = useMemo(() => {
     if (!songsQuery.data) return [];

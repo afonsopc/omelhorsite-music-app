@@ -1,3 +1,5 @@
+import { Method, sendRequest } from "../lib/request";
+
 export const BACKEND_URL = "https://omelhorsite.pt/backend";
 
 export const FALLBACK_IMAGE_URL = "https://omelhorsite.pt/fallbackPhoto.jpg";
@@ -41,29 +43,10 @@ export type ListFilters<T = {}, U = {}> = {
   extra_options?: ExtraOptionsFilters<U>;
 };
 
-export class ApiResponse<T> {
-  constructor(
-    public response: Response,
-    public data: T,
-  ) {
-    this.response = response;
-    this.data = data;
-  }
-}
-
-export class ApiError extends Error {
-  constructor(
-    public response: Response,
-    public error?: any,
-  ) {
-    super(`API Error: ${status}`);
-    this.response = response;
-    this.error = error;
-  }
-}
-
 const transformNulls = (obj?: any): any => {
   if (!obj || typeof obj !== "object") return obj;
+
+  if (obj instanceof FormData) return obj;
 
   if (Array.isArray(obj)) {
     return obj.map((v) => (v === null ? "\b" : transformNulls(v)));
@@ -77,90 +60,31 @@ const transformNulls = (obj?: any): any => {
   );
 };
 
-const stringifyParams = (params: Record<string, any>) => {
-  const pairs: string[] = [];
-
-  const processValue = (value: any, key: string, prefix: string | null) => {
-    const fullKey = prefix ? `${prefix}[${key}]` : key;
-
-    if (Array.isArray(value)) {
-      value.forEach((item) => {
-        if (typeof item === "object" && item !== null) {
-          processObject(item, `${fullKey}[]`);
-        } else {
-          pairs.push(`${fullKey}[]=${item}`);
-        }
-      });
-    } else if (typeof value === "object" && value !== null) {
-      processObject(value, fullKey);
-    } else {
-      pairs.push(`${fullKey}=${value}`);
-    }
-  };
-
-  const processObject = (
-    obj: Record<string, any>,
-    prefix: string | null = null,
-  ) => {
-    for (const key of Object.keys(obj)) {
-      processValue(obj[key], key, prefix);
-    }
-  };
-
-  processObject(params);
-  return pairs.join("&");
-};
-
-export const backend = async <T = any>(
+export const backend = <T = any>(
   route: string,
-  method: "GET" | "POST" | "PATCH" | "PUT" | "DELETE" = "GET",
+  method: Method,
   data?: any,
   params?: any,
-): Promise<ApiResponse<T>> => {
-  const cleanRoute = route.startsWith("/") ? route.slice(1) : route;
-  const url = new URL(BACKEND_URL + (cleanRoute ? "/" + cleanRoute : ""));
-  let allParams = {};
+  options?: {
+    onUploadProgress?: (progressEvent: any) => void;
+    responseType?: any;
+  },
+) => {
+  let transformedData = transformNulls(data);
+  let transformedParams = transformNulls(params);
+  const actualParams =
+    (transformedParams ?? method === Method.GET) ? transformedData : undefined;
+  const actualBody = method === Method.GET ? undefined : transformedData;
 
-  if (params) {
-    allParams = { ...allParams, ...params };
-  }
-
-  if (data && method === "GET") {
-    allParams = { ...allParams, ...data };
-  }
-
-  if (Object.keys(allParams).length > 0) {
-    const transformedParams = transformNulls(allParams);
-    const stringifiedParams = stringifyParams(transformedParams);
-    url.search = stringifiedParams;
-  }
-
-  const options: RequestInit = {
+  return sendRequest<T>({
+    token: authToken ?? undefined,
+    url: BACKEND_URL + "/" + route,
     method,
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: authToken ? `Bearer ${authToken}` : "",
-    },
-  };
-
-  if (method !== "GET" && data) {
-    options.body = JSON.stringify(transformNulls(data));
-  }
-
-  const response = await fetch(url.toString(), options);
-
-  if (!response.ok) {
-    throw new ApiError(response);
-  }
-
-  try {
-    const responseData = await response.json();
-
-    return new ApiResponse<T>(response, responseData);
-  } catch (error) {
-    throw new ApiError(response, error);
-  }
+    body: actualBody,
+    params: actualParams,
+    onUploadProgress: options?.onUploadProgress,
+    responseType: options?.responseType,
+  });
 };
 
 export const getAuthenticatedBackendUrl = (

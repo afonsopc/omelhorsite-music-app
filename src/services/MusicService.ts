@@ -1,6 +1,7 @@
 import { Track, PitchAlgorithm } from "react-native-track-player";
 import { backend, FALLBACK_IMAGE_URL, ListFilters } from "./BackendService";
 import { FsNode } from "./FsNodeService";
+import { Method } from "../lib/request";
 
 export type Song = {
   id: number;
@@ -48,21 +49,25 @@ export type Album = {
 
 export const Song = {
   list: (filters: ListFilters<Song> = {}) =>
-    backend<Song[]>("songs", "GET", filters).then((response) => response.data),
+    backend<Song[]>("songs", Method.GET, filters).then(
+      (response) => response.data,
+    ),
   get: (id: Song["id"]) =>
-    backend<Song>(`songs/${id}`, "GET").then((response) => response.data),
+    backend<Song>(`songs/${id}`, Method.GET).then((response) => response.data),
   update: (id: Song["id"], data: Partial<Song>) =>
-    backend<Song>(`songs/${id}`, "PATCH", data).then(
+    backend<Song>(`songs/${id}`, Method.PATCH, data).then(
       (response) => response.data,
     ),
   delete: (id: Song["id"]) =>
-    backend<void>(`songs/${id}`, "DELETE").then((response) => response.data),
+    backend<void>(`songs/${id}`, Method.DELETE).then(
+      (response) => response.data,
+    ),
   listArtists: (filters: ListFilters<Song> = {}) =>
-    backend<string[]>("songs/artists", "GET", filters).then(
+    backend<string[]>("songs/artists", Method.GET, filters).then(
       (response) => response.data,
     ),
   listAlbums: (filters: ListFilters<Song> = {}) =>
-    backend<Album[]>("songs/albums", "GET", filters).then(
+    backend<Album[]>("songs/albums", Method.GET, filters).then(
       (response) => response.data,
     ),
   getArtistPictures: (artistName: string) =>
@@ -76,7 +81,7 @@ export const Song = {
       }[];
     }>(
       `songs/artist_pictures?name=${encodeURIComponent(artistName)}`,
-      "GET",
+      Method.GET,
     ).then((response) => response.data.pictures),
   getArtistPicture: (artistName: string) =>
     Song.getArtistPictures(artistName).then(
@@ -120,28 +125,28 @@ export const Song = {
 
 export const Playlist = {
   list: (filters: ListFilters<Playlist> = {}) =>
-    backend<Playlist[]>("playlists", "GET", filters).then(
+    backend<Playlist[]>("playlists", Method.GET, filters).then(
       (response) => response.data,
     ),
   get: (id: Playlist["id"]) =>
-    backend<Playlist>(`playlists/${id}`, "GET").then(
+    backend<Playlist>(`playlists/${id}`, Method.GET).then(
       (response) => response.data,
     ),
   create: (name: string, artworkFsNodeId?: Playlist["artwork_fs_node_id"]) =>
-    backend<Playlist>("playlists", "POST", {
+    backend<Playlist>("playlists", Method.POST, {
       name,
       artwork_fs_node_id: artworkFsNodeId,
     }).then((response) => response.data),
   update: (id: Playlist["id"], data: Partial<Playlist>) =>
-    backend<Playlist>(`playlists/${id}`, "PATCH", data).then(
+    backend<Playlist>(`playlists/${id}`, Method.PATCH, data).then(
       (response) => response.data,
     ),
   delete: (id: Playlist["id"]) =>
-    backend<void>(`playlists/${id}`, "DELETE").then(
+    backend<void>(`playlists/${id}`, Method.DELETE).then(
       (response) => response.data,
     ),
   reorder: (id: Playlist["id"], songIds: number[]) =>
-    backend<void>(`playlists/${id}/reorder`, "POST", {
+    backend<void>(`playlists/${id}/reorder`, Method.POST, {
       song_ids: songIds,
     }).then((response) => response.data),
   artworkUrl: (playlist: Playlist) => {
@@ -162,15 +167,15 @@ export const PlaylistSong = {
   list: (playlistId: Playlist["id"]) =>
     backend<PlaylistSong[]>(
       `playlist_songs?playlist_id=${playlistId}`,
-      "GET",
+      Method.GET,
     ).then((response) => response.data),
   create: (playlistId: Playlist["id"], songId: Song["id"]) =>
-    backend<PlaylistSong>("playlist_songs", "POST", {
+    backend<PlaylistSong>("playlist_songs", Method.POST, {
       playlist_id: playlistId,
       song_id: songId,
     }).then((response) => response.data),
   delete: (id: PlaylistSong["id"]) =>
-    backend<void>(`playlist_songs/${id}`, "DELETE").then(
+    backend<void>(`playlist_songs/${id}`, Method.DELETE).then(
       (response) => response.data,
     ),
   is: (variable: any): variable is PlaylistSong => {

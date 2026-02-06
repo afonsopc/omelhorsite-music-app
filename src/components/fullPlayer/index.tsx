@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
@@ -56,6 +56,26 @@ export const FullPlayer = ({ onClose }: { onClose?: () => void }) => {
     setPlaybackSpeed(speed);
   };
 
+  const handleArtistPress = useCallback(() => {
+    if (currentSong.artist) {
+      onClose?.();
+      router.push({
+        pathname: "/artist/[name]",
+        params: { name: currentSong.artist },
+      });
+    }
+  }, [currentSong.artist, onClose, router]);
+
+  const handleAlbumPress = useCallback(() => {
+    if (currentSong.album) {
+      onClose?.();
+      router.push({
+        pathname: "/album/[name]",
+        params: { name: currentSong.album, artist: currentSong.artist || "" },
+      });
+    }
+  }, [currentSong.album, currentSong.artist, onClose, router]);
+
   const artworkUrl = Song.artworkUrl(currentSong);
 
   return (
@@ -70,6 +90,8 @@ export const FullPlayer = ({ onClose }: { onClose?: () => void }) => {
           title={currentSong.title}
           artist={currentSong.artist || "Unknown Artist"}
           album={currentSong.album || "Unknown Album"}
+          onArtistPress={currentSong.artist ? handleArtistPress : undefined}
+          onAlbumPress={currentSong.album ? handleAlbumPress : undefined}
         />
 
         <PlayerProgress onSeek={seek} />

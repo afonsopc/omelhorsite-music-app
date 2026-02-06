@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "music-app",
-    "slug": "music-app",
+    "name": "OMS Music",
+    "slug": "oms-music",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "pt.omelhorsie.music-app",
+      "bundleIdentifier": "pt.omelhorsie.oms-music",
       "userInterfaceStyle": "dark",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
@@ -44,7 +44,7 @@
       "expo-router",
       "expo-asset"
     ],
-    "scheme": "music-app",
+    "scheme": "oms-music",
     "extra": {
       "router": {},
       "eas": {

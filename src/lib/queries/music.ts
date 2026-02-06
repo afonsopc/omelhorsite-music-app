@@ -13,12 +13,12 @@ export const LIST_ARTIST_PICTURES = "listArtistPictures";
 export const SEARCH = "search";
 
 const query = <T>(
-  queryKey: string,
+  queryKey: readonly unknown[],
   queryFn: () => Promise<T>,
   options?: { enabled?: boolean },
 ) => {
   return useQuery({
-    queryKey: [queryKey],
+    queryKey,
     queryFn,
     enabled: options?.enabled,
   });
@@ -28,26 +28,30 @@ export const useGetSongQuery = (
   id: number,
   options?: Record<string, string>,
 ) => {
-  return query(GET_SONG + id, () => Song.get(id), options);
+  return query([GET_SONG, id], () => Song.get(id), options);
 };
 
 export const useListSongsQuery = (
   filters: ListFilters<Song> = {},
   options?: Record<string, string>,
-) => query(LIST_SONGS, () => Song.list(filters), options);
+) => query([LIST_SONGS, filters], () => Song.list(filters), options);
 
 export const useListArtistsQuery = (
   filters: ListFilters<Song> = {},
   options?: Record<string, string>,
 ) => {
-  return query(LIST_ARTISTS, () => Song.listArtists(filters), options);
+  return query(
+    [LIST_ARTISTS, filters],
+    () => Song.listArtists(filters),
+    options,
+  );
 };
 
 export const useListAlbumsQuery = (
   filters: ListFilters<Song> = {},
   options?: Record<string, string>,
 ) => {
-  return query(LIST_ALBUMS, () => Song.listAlbums(filters), options);
+  return query([LIST_ALBUMS, filters], () => Song.listAlbums(filters), options);
 };
 
 export const useListSongsByArtistQuery = (
@@ -55,7 +59,7 @@ export const useListSongsByArtistQuery = (
   options?: Record<string, string>,
 ) => {
   return query(
-    LIST_SONGS + artistName,
+    [LIST_SONGS, "byArtist", artistName],
     () => Song.list({ exact_search: { artist: artistName } }),
     options,
   );
@@ -66,7 +70,7 @@ export const useListAlbumsByArtistQuery = (
   options?: Record<string, string>,
 ) => {
   return query(
-    LIST_ALBUMS + artistName,
+    [LIST_ALBUMS, "byArtist", artistName],
     () => Song.listAlbums({ exact_search: { artist: artistName } }),
     options,
   );
@@ -79,10 +83,23 @@ export const useListSongsByAlbumQuery = (
 ) => {
   const filters = artistName
     ? { exact_search: { album: albumName, artist: artistName } }
-    : { exact_search: { album: albumName } };
+    : { exact_search: { album: albumName, artist: null } };
   return query(
-    LIST_SONGS + albumName + (artistName || ""),
-    () => Song.list(filters),
+    [LIST_SONGS, "byAlbum", albumName, artistName],
+    async () => {
+      const songs = await Song.list(filters);
+      console.log(
+        "useListSongsByAlbumQuery - fetched songs:",
+        {
+          albumName,
+          artistName,
+          filters,
+          songsLength: songs.length,
+        },
+        songs,
+      );
+      return songs;
+    },
     options,
   );
 };
@@ -92,7 +109,7 @@ export const useArtitstPictureQuery = (
   options?: Record<string, string>,
 ) => {
   return query(
-    LIST_ARTIST_PICTURES + artistName,
+    [LIST_ARTIST_PICTURES, artistName],
     () => Song.getArtistPicture(artistName),
     options,
   );
@@ -106,7 +123,7 @@ export const useUpdateSongMutation = () => {
     },
     onSuccess: (song) => {
       queryClient.invalidateQueries({ queryKey: [LIST_SONGS] });
-      queryClient.invalidateQueries({ queryKey: [GET_SONG, song.id] });
+      queryClient.invalidateQueries({ queryKey: [GET_SONG] });
       queryClient.invalidateQueries({ queryKey: [LIST_ARTISTS] });
       queryClient.invalidateQueries({ queryKey: [LIST_ALBUMS] });
     },
@@ -131,9 +148,5 @@ export const useSearchQuery = (
   searchTerm: string,
   options?: { enabled?: boolean },
 ) => {
-  return query(
-    SEARCH + searchTerm,
-    () => search(searchTerm),
-    options,
-  );
+  return query([SEARCH, searchTerm], () => search(searchTerm), options);
 };
